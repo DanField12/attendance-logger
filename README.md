@@ -2,7 +2,6 @@
 
 This is a system for logging attendance to a church service.
 
----
 ## todo
 - add tests
 - finish it
