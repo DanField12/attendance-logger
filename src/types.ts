@@ -9,4 +9,5 @@ export interface newMember {
   lastname: string,
   email: string,
   phone: string,
+  date: Date,
 }
