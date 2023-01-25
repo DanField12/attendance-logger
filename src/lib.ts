@@ -3,6 +3,7 @@ import HTTPError from 'http-errors';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
+import { format } from 'date-fns'
 
 let adultAttendees: attendee[] = [];
 let kidsAttendees: attendee[] = [];
@@ -36,7 +37,7 @@ export function regularGetAll() {
     return {
       firstname: attendee.firstname,
       lastname: attendee.lastname,
-      date: attendee.date.getHours() + ':' + attendee.date.getMinutes(),
+      date: format(attendee.date, 'H:mm'),
     }
   })};
 }
@@ -48,7 +49,7 @@ export function newGetAll() {
       lastname: attendee.lastname,
       email: attendee.email,
       phone: attendee.phone,
-      date: attendee.date.getHours() + ':' + attendee.date.getMinutes(),
+      date: format(attendee.date, 'H:mm'),
     }
   })};
 }

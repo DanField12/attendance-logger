@@ -13,35 +13,59 @@
       <br>
       <h1>Welcome to St David's</h1>
 
-      <div class="container" style="padding-top: 30vh;" id="startButtons">
-        <div style="padding: 0.3vw;">
-          <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">
-            I'm A Regular
-          </button>
+      <div id="signInForm">
+        <div class="container" style="padding-top: 30vh;" id="startButtons">
+          <div style="padding: 0.3vw;">
+            <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">
+              I'm A Regular
+            </button>
+          </div>
+          <div style="padding: 0.3vw;">
+            <button class="btn btn-primary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#newMember" aria-expanded="false" aria-controls="newMember">
+              I'm New Here
+            </button>
+          </div>
         </div>
-        <div style="padding: 0.3vw;">
-          <button class="btn btn-primary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#newMember" aria-expanded="false" aria-controls="newMember">
-            I'm New Here
-          </button>
+      
+        <div class="collapse" id="regular">
+          <form id="regularForm">
+            <div class="mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstName">
+            </div>
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastName">
+            </div>
+            <div id="alertSignIn"></div>
+            <div>
+              <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">Back</button>
+              <button type="submit" class="btn btn-primary">Print A Name Tag</button>  
+            </div>
+          </form>
+        </div>
+  
+        <div class="collapse" id="newMember">
+          <form id="newMemberForm">
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="First Name" id="newFirstName">
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Last Name" id="newLastName">
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Phone Number" id="phone">
+            </div>
+            <div class="mb-3">
+              <input type="email" class="form-control" placeholder="Email Address" id="email">
+            </div>
+            <div>
+              <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#newMember" aria-expanded="false" aria-controls="newMember">Back</button>
+              <button type="submit" class="btn btn-primary">Print A Name Tag</button>
+            </div>
+          </form>
         </div>
       </div>
-    
-      <!-- <a href="./new"><button class="btn btn-primary">I'm New Here</button></a> -->
-      <div class="collapse" id="regular">
-      <form id="inputForm">
-        <div class="mb-3">
-          <label for="firstName" class="form-label">First Name</label>
-          <input type="text" class="form-control" id="firstName">
-        </div>
-        <div class="mb-3">
-          <label for="lastName" class="form-label">Last Name</label>
-          <input type="text" class="form-control" id="lastName">
-        </div>
-        <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">Back</button>
-        <button type="submit" class="btn btn-primary">Print</button>
-      </form>
-      </div>
-      <br>
     </div>
     <script>
       regular.addEventListener('show.bs.collapse', event => {
@@ -59,17 +83,31 @@
 
     </script>
     <script>
-      inputForm.onsubmit = async (e) => {
-        e.preventDefault();
-        await fetch('/member/regular', {
+      postInfo = async (endPoint, payload) => {
+        await fetch(endPoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ firstname: firstName.value, lastname: lastName.value })
+          body: JSON.stringify(payload)
         })
           .then(response => response.json())
-          .catch(err => console.log(err));
+          .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thanks ${payload.firstname} for signing in!</p>`)
+          .catch((err) => {
+            alertSignIn.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                Sorry, it looks like you have already signed in.
+            </div>`;
+          });
+      }
+
+      regularForm.onsubmit = async (e) => {
+        e.preventDefault();
+        await postInfo('/member/regular', { firstname: firstName.value, lastname: lastName.value });
+      };
+      newMemberForm.onsubmit = async (e) => {
+        e.preventDefault();
+        await postInfo('/member/new', { firstname: newFirstName.value, lastname: newLastName.value, phone: phone.value, email: email.value});
       };
     </script>
   </body>

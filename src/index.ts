@@ -16,11 +16,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, '/frontend/index.html'));
 });
 
-app.get("/new", (req, res) => {
-  res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '/frontend/new.html'));
-});
-
 app.get("/admin/login", (req, res) => {
   res.set('Content-Type', 'text/html');
   res.sendFile(path.join(__dirname, '/frontend/admin-login.html'));
