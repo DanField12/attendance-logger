@@ -31,11 +31,11 @@
           <form id="regularForm">
             <div class="mb-3">
               <label for="firstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="firstName">
+              <input type="text" class="form-control" id="firstName" required>
             </div>
             <div class="mb-3">
               <label for="lastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="lastName">
+              <input type="text" class="form-control" id="lastName" required>
             </div>
             <div id="alertSignIn"></div>
             <div>
@@ -48,16 +48,16 @@
         <div class="collapse" id="newMember">
           <form id="newMemberForm">
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="First Name" id="newFirstName">
+              <input type="text" class="form-control" placeholder="First Name" id="newFirstName" required>
             </div>
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Last Name" id="newLastName">
+              <input type="text" class="form-control" placeholder="Last Name" id="newLastName" required>
             </div>
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Phone Number" id="phone">
+              <input type="text" class="form-control" placeholder="Phone Number" id="phone" required>
             </div>
             <div class="mb-3">
-              <input type="email" class="form-control" placeholder="Email Address" id="email">
+              <input type="email" class="form-control" placeholder="Email Address" id="email" required>
             </div>
             <div>
               <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#newMember" aria-expanded="false" aria-controls="newMember">Back</button>
@@ -65,22 +65,14 @@
             </div>
           </form>
         </div>
+        
       </div>
     </div>
     <script>
-      regular.addEventListener('show.bs.collapse', event => {
-        startButtons.hidden = true;
-      })
-      regular.addEventListener('hidden.bs.collapse', event => {
-        startButtons.hidden = false;
-      })
-      newMember.addEventListener('show.bs.collapse', event => {
-        startButtons.hidden = true;
-      })
-      newMember.addEventListener('hidden.bs.collapse', event => {
-        startButtons.hidden = false;
-      })
-
+      regular.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
+      regular.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
+      newMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
+      newMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
     </script>
     <script>
       postInfo = async (endPoint, payload) => {

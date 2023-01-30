@@ -13,17 +13,17 @@ app.use(errorHandler());
 // frontend routes
 app.get("/", (req, res) => {
   res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '/frontend/index.html'));
+  res.sendFile(path.join(__dirname, '/../../frontend/index.html'));
 });
 
 app.get("/admin/login", (req, res) => {
   res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '/frontend/admin-login.html'));
+  res.sendFile(path.join(__dirname, '/../../frontend/admin-login.html'));
 });
 
 app.get("/admin", (req, res) => {
   res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '/frontend/admin.html'));
+  res.sendFile(path.join(__dirname, '/../../frontend/admin.html'));
 });
 
 // backend routes

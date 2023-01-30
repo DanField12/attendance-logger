@@ -22,6 +22,8 @@ function saveSessions(sessions: string[]) {
 }
 
 export function memberRegular(firstname: string, lastname: string) {
+  if (firstname === '' || firstname === undefined) throw HTTPError(400, 'firstname is invalid');
+  if (lastname === '' || lastname === undefined) throw HTTPError(400, 'firstname is invalid');
   for (let attendee of adultAttendees) {
     if (attendee.firstname === firstname && attendee.lastname === lastname) {
       throw HTTPError(400, 'user has already signed in');
