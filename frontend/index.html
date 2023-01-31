@@ -30,17 +30,20 @@
         <div class="collapse" id="regular">
           <form id="regularForm">
             <div class="mb-3">
-              <label for="firstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="firstName" required>
+              <!-- <label for="firstName" class="form-label">First Name</label> -->
+              <input type="text" class="form-control" id="nameInput" autocomplete="off" placeholder="Please enter your full name" data-bs-toggle="dropdown" required>
+              <div>
+                <ul class="dropdown-menu overflow-scroll" id="dropdownNamesMenu" style="max-height: 60vh;"></ul>
+              </div>
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="lastName" class="form-label">Last Name</label>
               <input type="text" class="form-control" id="lastName" required>
-            </div>
+            </div> -->
             <div id="alertSignIn"></div>
             <div>
               <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">Back</button>
-              <button type="submit" class="btn btn-primary">Print A Name Tag</button>  
+              <button type="submit" class="btn btn-primary" id="submitRegular" disabled>Print A Name Tag</button>  
             </div>
           </form>
         </div>
@@ -54,7 +57,7 @@
               <input type="text" class="form-control" placeholder="Last Name" id="newLastName" required>
             </div>
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Phone Number" id="phone" required>
+              <input type="tel" class="form-control" placeholder="Phone Number" id="phone" required>
             </div>
             <div class="mb-3">
               <input type="email" class="form-control" placeholder="Email Address" id="email" required>
@@ -68,13 +71,60 @@
         
       </div>
     </div>
+
     <script>
       regular.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
       regular.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
       newMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
       newMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
     </script>
+
     <script>
+      let globalFirstname = '';
+      let globalLastname = '';
+
+      (async () => {
+        let names = await fetch('/people')
+          .then(response => response.json())
+          .then(result => result.people.map(name => {
+            return { firstname: name.firstname, lastname: name.lastname, fullname: name.firstname + ' ' + name.lastname }
+          }))
+          .catch(err => {
+              alertSignIn.innerHTML = `
+              <div class="alert alert-danger" role="alert">
+                  Something went wrong, please try again later.
+              </div>`;
+          });
+          console.log(names)
+        nameInput.addEventListener('input', event => {
+          document.getElementById('dropdownNamesMenu').innerHTML = names
+            .filter(name => name.fullname.toLowerCase().includes(nameInput.value.toLowerCase()))
+            .map(name => `<li><a class="dropdown-item" href="#" onclick="clickName('${name.firstname}', '${name.lastname}', '${name.fullname}')">${name.fullname}</a></li>`)
+            .join(' ');
+          
+          const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
+          const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
+          
+          let name = names.find(name => name.fullname === nameInput.value)
+          if (name !== undefined) {
+            autocomplete(name.firstname, name.lastname);
+          } else {
+            submitRegular.disabled = true;
+          }
+
+        });
+      })();
+      function autocomplete(firstname, lastname) {
+        submitRegular.disabled = false;
+        globalFirstname = firstname;
+        globalLastname = lastname;
+      }
+
+      function clickName(firstname, lastname, fullname) {
+        autocomplete(firstname, lastname);
+        nameInput.value = fullname;
+      }
+
       postInfo = async (endPoint, payload) => {
         await fetch(endPoint, {
           method: 'POST',
@@ -95,7 +145,7 @@
 
       regularForm.onsubmit = async (e) => {
         e.preventDefault();
-        await postInfo('/member/regular', { firstname: firstName.value, lastname: lastName.value });
+        await postInfo('/member/regular', { firstname: globalFirstname, lastname: globalLastname });
       };
       newMemberForm.onsubmit = async (e) => {
         e.preventDefault();

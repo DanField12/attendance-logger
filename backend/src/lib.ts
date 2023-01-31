@@ -1,13 +1,15 @@
-import { attendee, newMember } from './types';
+import { attendee, newMember, fullName } from './types';
 import HTTPError from 'http-errors';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import { format } from 'date-fns'
+import { format } from 'date-fns';
+import axios from 'axios';
+import { key } from './elvanto-api-key.json'
 
 let adultAttendees: attendee[] = [];
-let kidsAttendees: attendee[] = [];
 let newMembers: newMember[] = [];
+let printQueue: string[] = [];
 
 function doHash(text: string): string {
   return crypto.createHash('sha256').update(text).digest('hex');
@@ -21,14 +23,31 @@ function saveSessions(sessions: string[]) {
   fs.writeFileSync(path.join(__dirname, './sessions.json'), JSON.stringify({ sessions: sessions }));
 }
 
+export async function getPeople(): Promise<fullName[]> {
+  let people: fullName[] = [];
+  let i = 1;
+  while (true) {
+    let result = await axios.get(`https://api.elvanto.com/v1/people/getAll.json?page=${i}`, {
+      auth: { username: key, password: 'x' }
+    });
+    for (let person of await result.data.people.person) {
+      people.push({ firstname: person.firstname, lastname: person.lastname })
+    }
+    i++;
+    if (result.data.people.on_this_page < 1000) break;
+  }
+  return people;
+}
+
 export function memberRegular(firstname: string, lastname: string) {
   if (firstname === '' || firstname === undefined) throw HTTPError(400, 'firstname is invalid');
-  if (lastname === '' || lastname === undefined) throw HTTPError(400, 'firstname is invalid');
+  if (lastname === '' || lastname === undefined) throw HTTPError(400, 'lastname is invalid');
   for (let attendee of adultAttendees) {
     if (attendee.firstname === firstname && attendee.lastname === lastname) {
       throw HTTPError(400, 'user has already signed in');
     }
   }
+  printQueue.push(firstname);
   adultAttendees.push({ firstname, lastname, date: new Date()});
   console.log(adultAttendees);
   return {};
@@ -57,6 +76,7 @@ export function newGetAll() {
 }
 
 export function memberNew(firstname: string, lastname: string, email: string, phone: string) {
+  printQueue.push(firstname);
   adultAttendees.push({firstname, lastname, date: new Date()});
   newMembers.push({firstname, lastname, email, phone, date: new Date()});
   return {};
@@ -102,4 +122,10 @@ export function adminLogIn(password: string) {
     return { sessionId: sessionId };
   }
   throw HTTPError(403, 'incorrect password');
+}
+
+export function getPrintQueue() {
+  let res = printQueue.join()
+  printQueue = [];
+  return res;
 }

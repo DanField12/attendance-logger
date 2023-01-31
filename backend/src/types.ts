@@ -11,3 +11,8 @@ export interface newMember {
   phone: string,
   date: Date,
 }
+
+export interface fullName {
+  firstname: string,
+  lastname: string,
+}

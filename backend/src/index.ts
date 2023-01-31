@@ -2,7 +2,7 @@ import express, { json } from 'express';
 import path from 'path';
 // import fs from 'fs';
 import errorHandler from 'middleware-http-errors';
-import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
+import { adminLogIn, clear, csv, getPeople, getPrintQueue, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
 
 const app = express()
 
@@ -27,6 +27,10 @@ app.get("/admin", (req, res) => {
 });
 
 // backend routes
+app.get("/people", async (req, res) => {
+  res.json({ people: await getPeople() });
+});
+
 app.post("/admin/login/password", (req, res) => {
   const { password } = req.body;
   res.json(adminLogIn(password));
@@ -34,7 +38,6 @@ app.post("/admin/login/password", (req, res) => {
 
 app.get("/csv", (req, res) => {
   const sessionId = req.get('sessionId') as string
-  console.log(sessionId);
   const before = parseInt(req.query.before as string);
   const after = parseInt(req.query.after as string);
   res.json(csv(sessionId, before, after));
@@ -61,6 +64,10 @@ app.post("/member/new", (req, res) => {
 
 app.get("/member/new/getAll", (req, res) => {
   res.json(newGetAll());
+});
+
+app.get("/printQueue", (req, res) => {
+  res.send(getPrintQueue());
 });
 
 app.listen(8000);
