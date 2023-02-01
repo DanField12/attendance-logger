@@ -30,16 +30,11 @@
         <div class="collapse" id="regular">
           <form id="regularForm">
             <div class="mb-3">
-              <!-- <label for="firstName" class="form-label">First Name</label> -->
               <input type="text" class="form-control" id="nameInput" autocomplete="off" placeholder="Please enter your full name" data-bs-toggle="dropdown" required>
               <div>
                 <ul class="dropdown-menu overflow-scroll" id="dropdownNamesMenu" style="max-height: 60vh;"></ul>
               </div>
             </div>
-            <!-- <div class="mb-3">
-              <label for="lastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="lastName" required>
-            </div> -->
             <div id="alertSignIn"></div>
             <div>
               <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regular" aria-expanded="false" aria-controls="regular">Back</button>
@@ -62,6 +57,7 @@
             <div class="mb-3">
               <input type="email" class="form-control" placeholder="Email Address" id="email" required>
             </div>
+            <div id="alertNewSignIn"></div>
             <div>
               <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#newMember" aria-expanded="false" aria-controls="newMember">Back</button>
               <button type="submit" class="btn btn-primary">Print A Name Tag</button>
@@ -139,6 +135,10 @@
             alertSignIn.innerHTML = `
             <div class="alert alert-danger" role="alert">
                 Sorry, it looks like you have already signed in.
+            </div>`;
+            alertNewSignIn.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                An error occurred, please try again later.
             </div>`;
           });
       }

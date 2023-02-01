@@ -1,14 +1,30 @@
 import express, { json } from 'express';
 import path from 'path';
-// import fs from 'fs';
 import errorHandler from 'middleware-http-errors';
-import { adminLogIn, clear, csv, getPeople, getPrintQueue, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
+import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
+import { fullName } from './types';
+import { getPeople } from './people';
+import { PrintQueue } from './print';
 
 const app = express()
 
 app.use(json());
 
 app.use(errorHandler());
+
+let printQueue = new PrintQueue();
+
+// Retry until a connection can be made to the alvanto api.
+let people: fullName[] | void;
+let intervalId = setInterval(
+async () => {
+  people = await getPeople()
+  .then((res) => {
+    clearInterval(intervalId);
+    return res;
+  })
+  .catch(err => console.log(err));
+}, 2000);
 
 // frontend routes
 app.get("/", (req, res) => {
@@ -27,8 +43,12 @@ app.get("/admin", (req, res) => {
 });
 
 // backend routes
-app.get("/people", async (req, res) => {
-  res.json({ people: await getPeople() });
+app.get("/people", (req, res) => {
+  if (!people) {
+    res.status(500).send()
+  } else {
+    res.json({ people });
+  }
 });
 
 app.post("/admin/login/password", (req, res) => {
@@ -50,6 +70,7 @@ app.delete("/clear", (req, res) => {
 
 app.post("/member/regular", (req, res) => {
   let { firstname, lastname } = req.body;
+  printQueue.push(firstname + ' ' + lastname);
   res.json(memberRegular(firstname, lastname));
 });
 
@@ -57,9 +78,16 @@ app.get("/member/regular/getAll", (req, res) => {
   res.json(regularGetAll());
 });
 
-app.post("/member/new", (req, res) => {
+app.post("/member/new", async (req, res) => {
   let { firstname, lastname, email, phone } = req.body;
-  res.json(memberNew(firstname, lastname, email, phone));
+  memberNew(firstname, lastname, email, phone)
+    .then(() => {
+      printQueue.push(firstname + ' ' + lastname);
+      res.json({});
+    })
+    .catch((err) => {
+      res.status(500).send();
+    })
 });
 
 app.get("/member/new/getAll", (req, res) => {
@@ -67,7 +95,7 @@ app.get("/member/new/getAll", (req, res) => {
 });
 
 app.get("/printQueue", (req, res) => {
-  res.send(getPrintQueue());
+  res.send(printQueue.dumpAsCSV());
 });
 
 app.listen(8000);

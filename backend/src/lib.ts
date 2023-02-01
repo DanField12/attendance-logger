@@ -1,15 +1,14 @@
-import { attendee, newMember, fullName } from './types';
+import { attendee, newMember } from './types';
 import HTTPError from 'http-errors';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { format } from 'date-fns';
-import axios from 'axios';
+import axios from "axios";
 import { key } from './elvanto-api-key.json'
 
 let adultAttendees: attendee[] = [];
 let newMembers: newMember[] = [];
-let printQueue: string[] = [];
 
 function doHash(text: string): string {
   return crypto.createHash('sha256').update(text).digest('hex');
@@ -23,22 +22,6 @@ function saveSessions(sessions: string[]) {
   fs.writeFileSync(path.join(__dirname, './sessions.json'), JSON.stringify({ sessions: sessions }));
 }
 
-export async function getPeople(): Promise<fullName[]> {
-  let people: fullName[] = [];
-  let i = 1;
-  while (true) {
-    let result = await axios.get(`https://api.elvanto.com/v1/people/getAll.json?page=${i}`, {
-      auth: { username: key, password: 'x' }
-    });
-    for (let person of await result.data.people.person) {
-      people.push({ firstname: person.firstname, lastname: person.lastname })
-    }
-    i++;
-    if (result.data.people.on_this_page < 1000) break;
-  }
-  return people;
-}
-
 export function memberRegular(firstname: string, lastname: string) {
   if (firstname === '' || firstname === undefined) throw HTTPError(400, 'firstname is invalid');
   if (lastname === '' || lastname === undefined) throw HTTPError(400, 'lastname is invalid');
@@ -47,7 +30,6 @@ export function memberRegular(firstname: string, lastname: string) {
       throw HTTPError(400, 'user has already signed in');
     }
   }
-  printQueue.push(firstname);
   adultAttendees.push({ firstname, lastname, date: new Date()});
   console.log(adultAttendees);
   return {};
@@ -75,11 +57,26 @@ export function newGetAll() {
   })};
 }
 
-export function memberNew(firstname: string, lastname: string, email: string, phone: string) {
-  printQueue.push(firstname);
+export async function memberNew(firstname: string, lastname: string, email: string, phone: string) {
+  let personId = await axios.post('https://api.elvanto.com/v1/people/create.json', 
+    { firstname, lastname, email, phone, category_id: '0ee3d6b3-d425-4eba-a714-a34b1dfa504e' }, 
+    { auth: { username: key, password: 'x' }
+  }).then(result => { return result.data.person.id
+  }).catch(err => { 
+    console.log(err);
+    throw HTTPError(500, 'Error connecting to elvanto in create')
+  });
+
+  await axios.post('https://api.elvanto.com/v1/peopleFlows/steps/addPerson.json',
+    { step_id: 'c6ca4b16-3e4b-4c97-841b-507e623d4db6', person_id: personId },
+    { auth: { username: key, password: 'x' }
+  }).catch(err => { 
+    console.log(err);
+    throw HTTPError(500, 'Error connecting to elvanto in addPerson');
+  });
+
   adultAttendees.push({firstname, lastname, date: new Date()});
   newMembers.push({firstname, lastname, email, phone, date: new Date()});
-  return {};
 }
 
 export function csv(sessionId: string, before: number, after: number) {
@@ -92,9 +89,6 @@ export function csv(sessionId: string, before: number, after: number) {
   let afterDate = new Date();
   afterDate.setHours(after);
   afterDate.setMinutes(0);
-
-  // return { text: adultAttendees.filter((curr))
-  // }
 
   return { text: adultAttendees.reduce(
     (accumulator, curr) => {
@@ -122,10 +116,4 @@ export function adminLogIn(password: string) {
     return { sessionId: sessionId };
   }
   throw HTTPError(403, 'incorrect password');
-}
-
-export function getPrintQueue() {
-  let res = printQueue.join()
-  printQueue = [];
-  return res;
 }
