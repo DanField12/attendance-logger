@@ -7,7 +7,6 @@ using System.Timers;
 namespace MyProject;
 class Program
 {
-    private const string template = @"C:\Users\danfi\OneDrive\Desktop\attendance-logger\printer-app\printer-app\template.LBX";
     private const string endpoint = "http://localhost:8000/printQueue";
     private static System.Timers.Timer aTimer;
     static void Main(string[] args)
@@ -21,15 +20,16 @@ class Program
 
         Console.WriteLine("Terminating the application...");
     }
+
+    // Set a timer to continuously get names every 5 seconds
     private static void SetTimer()
     {
-        // Create a timer with a two second interval.
         aTimer = new System.Timers.Timer(5000);
-        // Hook up the Elapsed event for the timer. 
         aTimer.Elapsed += GetNames;
         aTimer.AutoReset = true;
         aTimer.Enabled = true;
     }
+
     private static void GetNames(System.Object source, ElapsedEventArgs e)
     {
         try
@@ -49,6 +49,7 @@ class Program
 
     private static void Print(string text)
     {
+        string template = Directory.GetCurrentDirectory() + "\\template.LBX";
         bpac.DocumentClass doc = new DocumentClass();
         if (doc.Open(template) != false)
         {

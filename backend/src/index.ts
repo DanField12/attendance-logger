@@ -15,7 +15,7 @@ app.use(errorHandler());
 let printQueue = new PrintQueue();
 
 // Retry until a connection can be made to the alvanto api.
-let people: fullName[] | void;
+let people: fullName[] = [];
 let intervalId = setInterval(
 async () => {
   people = await getPeople()
@@ -23,7 +23,10 @@ async () => {
     clearInterval(intervalId);
     return res;
   })
-  .catch(err => console.log(err));
+  .catch(err => { 
+    console.log(err);
+    return [];
+  });
 }, 2000);
 
 // frontend routes
@@ -44,7 +47,7 @@ app.get("/admin", (req, res) => {
 
 // backend routes
 app.get("/people", (req, res) => {
-  if (!people) {
+  if (people.length === 0) {
     res.status(500).send()
   } else {
     res.json({ people });
@@ -82,6 +85,7 @@ app.post("/member/new", async (req, res) => {
   let { firstname, lastname, email, phone } = req.body;
   memberNew(firstname, lastname, email, phone)
     .then(() => {
+      people.push({ firstname, lastname })
       printQueue.push(firstname + ' ' + lastname);
       res.json({});
     })
