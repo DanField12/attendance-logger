@@ -6,6 +6,7 @@ import path from 'path';
 import { format } from 'date-fns';
 import axios from "axios";
 import { key } from './elvanto-api-key.json'
+import { PrintQueue } from './print';
 
 let adultAttendees: attendee[] = [];
 let newMembers: newMember[] = [];
@@ -22,7 +23,7 @@ function saveSessions(sessions: string[]) {
   fs.writeFileSync(path.join(__dirname, './sessions.json'), JSON.stringify({ sessions: sessions }));
 }
 
-export function memberRegular(firstname: string, lastname: string) {
+export function memberRegular(firstname: string, lastname: string, printQueue: PrintQueue) {
   if (firstname === '' || firstname === undefined) throw HTTPError(400, 'firstname is invalid');
   if (lastname === '' || lastname === undefined) throw HTTPError(400, 'lastname is invalid');
   for (let attendee of adultAttendees) {
@@ -30,6 +31,7 @@ export function memberRegular(firstname: string, lastname: string) {
       throw HTTPError(400, 'user has already signed in');
     }
   }
+  printQueue.push(firstname + ' ' + lastname);
   adultAttendees.push({ firstname, lastname, date: new Date()});
   console.log(adultAttendees);
   return {};

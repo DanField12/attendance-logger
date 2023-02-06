@@ -73,8 +73,7 @@ app.delete("/clear", (req, res) => {
 
 app.post("/member/regular", (req, res) => {
   let { firstname, lastname } = req.body;
-  printQueue.push(firstname + ' ' + lastname);
-  res.json(memberRegular(firstname, lastname));
+  res.json(memberRegular(firstname, lastname, printQueue));
 });
 
 app.get("/member/regular/getAll", (req, res) => {
