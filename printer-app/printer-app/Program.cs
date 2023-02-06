@@ -39,7 +39,7 @@ class Program
         try
         {
             using HttpClient client = new();
-            string[] names = client.GetStringAsync(endpoint).Result.Split(',', System.StringSplitOptions.RemoveEmptyEntries);
+            string[] names = client.GetStringAsync(endpoint).Result.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
             foreach (string name in names)
             {
                 Print(name);
@@ -53,11 +53,13 @@ class Program
 
     private static void Print(string text)
     {
+        string[] name = text.Split(',');      
         string template = Directory.GetCurrentDirectory() + "\\template.LBX";
         bpac.DocumentClass doc = new DocumentClass();
         if (doc.Open(template) != false)
         {
-            doc.GetObject("Text2").Text = text;
+            doc.GetObject("firstname").Text = name[0];
+            doc.GetObject("lastname").Text = name[1];
             doc.StartPrint("", PrintOptionConstants.bpoDefault);
             doc.PrintOut(1, PrintOptionConstants.bpoDefault);
             doc.EndPrint();

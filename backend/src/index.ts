@@ -85,7 +85,7 @@ app.post("/member/new", async (req, res) => {
   memberNew(firstname, lastname, email, phone)
     .then(() => {
       people.push({ firstname, lastname })
-      printQueue.push(firstname + ' ' + lastname);
+      printQueue.push(firstname + ',' + lastname);
       res.json({});
     })
     .catch((err) => {

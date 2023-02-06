@@ -11,7 +11,7 @@ export class PrintQueue {
   }
 
   public dumpAsCSV() {
-    let currentQueue = this.queue.join();
+    let currentQueue = this.queue.join('\n');
     this.queue = [];
     return currentQueue;
   }

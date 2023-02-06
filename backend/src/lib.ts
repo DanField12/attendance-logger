@@ -31,7 +31,7 @@ export function memberRegular(firstname: string, lastname: string, printQueue: P
       throw HTTPError(400, 'user has already signed in');
     }
   }
-  printQueue.push(firstname + ' ' + lastname);
+  printQueue.push(firstname + ',' + lastname);
   adultAttendees.push({ firstname, lastname, date: new Date()});
   console.log(adultAttendees);
   return {};
