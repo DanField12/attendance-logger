@@ -7,11 +7,15 @@ using System.Timers;
 namespace MyProject;
 class Program
 {
-    private const string endpoint = "http://localhost:8000/printQueue";
     private static System.Timers.Timer aTimer;
     static void Main(string[] args)
     {
-        SetTimer();
+        if (args.Length != 1)
+        {
+            System.Console.WriteLine("Please enter a http endpoint to get the names from.");
+            return;
+        }
+        SetTimer(args[0]);
 
         Console.WriteLine("\nPress the Enter key to exit the application...\n");
         Console.ReadLine();
@@ -22,15 +26,15 @@ class Program
     }
 
     // Set a timer to continuously get names every 5 seconds
-    private static void SetTimer()
+    private static void SetTimer(string endpoint)
     {
         aTimer = new System.Timers.Timer(5000);
-        aTimer.Elapsed += GetNames;
+        aTimer.Elapsed += (sender, e) => GetNames(sender, e, endpoint);
         aTimer.AutoReset = true;
         aTimer.Enabled = true;
     }
 
-    private static void GetNames(System.Object source, ElapsedEventArgs e)
+    private static void GetNames(System.Object source, ElapsedEventArgs e, string endpoint)
     {
         try
         {
