@@ -59,11 +59,20 @@ export function newGetAll() {
   })};
 }
 
-export async function memberNew(firstname: string, lastname: string, email: string, phone: string) {
+export async function memberNew(firstname: string, lastname: string, contact: string) {
+  let payload;
+  if (contact.includes('@')) {
+    payload = { firstname, lastname, email: contact }
+  } else {
+    payload = { firstname, lastname, phone: contact }
+  }
+
   let personId = await axios.post('https://api.elvanto.com/v1/people/create.json', 
-    { firstname, lastname, email, phone, category_id: '0ee3d6b3-d425-4eba-a714-a34b1dfa504e' }, 
+    {...payload, category_id: '0ee3d6b3-d425-4eba-a714-a34b1dfa504e'},
     { auth: { username: key, password: 'x' }
-  }).then(result => { return result.data.person.id
+  }).then(result => { 
+    console.log(result);
+    return result.data.person.id
   }).catch(err => { 
     console.log(err);
     throw HTTPError(500, 'Error connecting to elvanto in create')
@@ -78,7 +87,7 @@ export async function memberNew(firstname: string, lastname: string, email: stri
   });
 
   adultAttendees.push({firstname, lastname, date: new Date()});
-  newMembers.push({firstname, lastname, email, phone, date: new Date()});
+  newMembers.push({...payload, date: new Date()});
 }
 
 export function csv(sessionId: string, before: number, after: number) {

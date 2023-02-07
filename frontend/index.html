@@ -52,10 +52,7 @@
               <input type="text" class="form-control" placeholder="Last Name" id="newLastName" required>
             </div>
             <div class="mb-3">
-              <input type="tel" class="form-control" placeholder="Phone Number" id="phone" required>
-            </div>
-            <div class="mb-3">
-              <input type="email" class="form-control" placeholder="Email Address" id="email" required>
+              <input type="text" class="form-control" placeholder="Phone Number or Email" id="contact" required pattern="^([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3})|(\d{3}-\d{3}-\d{4})$">
             </div>
             <div id="alertNewSignIn"></div>
             <div>
@@ -149,7 +146,7 @@
       };
       newMemberForm.onsubmit = async (e) => {
         e.preventDefault();
-        await postInfo('/member/new', { firstname: newFirstName.value, lastname: newLastName.value, phone: phone.value, email: email.value});
+        await postInfo('/member/new', { firstname: newFirstName.value, lastname: newLastName.value, contact: contact.value});
       };
     </script>
   </body>

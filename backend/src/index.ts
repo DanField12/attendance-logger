@@ -81,8 +81,8 @@ app.get("/member/regular/getAll", (req, res) => {
 });
 
 app.post("/member/new", async (req, res) => {
-  let { firstname, lastname, email, phone } = req.body;
-  memberNew(firstname, lastname, email, phone)
+  let { firstname, lastname, contact } = req.body;
+  memberNew(firstname, lastname, contact)
     .then(() => {
       people.push({ firstname, lastname })
       printQueue.push(firstname + ',' + lastname);

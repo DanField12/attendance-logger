@@ -74,7 +74,7 @@
         let table = result.attendees.map((curr, i) => 
          `<tr>
             <th scope="row">${i + 1}</th>
-            ${fields.map(field => `<td>${curr[field]}</td>`).join('')}
+            ${fields.map(field => `<td>${curr[field] ? curr[field] : '-' }</td>`).join('')}
             <td><a type="button">${trash}</a></td>
           </tr>`).join('')
         document.getElementById(elementId).innerHTML = table;
