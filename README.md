@@ -5,11 +5,11 @@ to a brother QL-810W printer. Any other printers will require their own program.
 
 ## todo
 - add tests
-- Send new user requests to Elvanto using the API
 - Fix the admin password
-- rewrite the frontend using react
 - Add support for signing in kids
   - Support for new kids
+- Create the 'Events' system.
+- rewrite the frontend using react
 
 ## How To Use
 1. In the releases, download and unzip the printer-app.zip file.

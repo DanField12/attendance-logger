@@ -11,7 +11,7 @@ import { PrintQueue } from './print';
 let adultAttendees: attendee[] = [];
 let newMembers: newMember[] = [];
 
-function doHash(text: string): string {
+export function doHash(text: string): string {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
@@ -110,7 +110,8 @@ export function clear(sessionId: string) {
 }
 
 export function adminLogIn(password: string) {
-  if (password === '123') {
+  const correctPassword = fs.readFileSync(path.join(__dirname, './hashed-password')).toString()
+  if (doHash(password) === correctPassword) {
     let sessionId = Math.random().toString().slice(2);
     let sessions = getSessions();
     sessions.push(sessionId);
