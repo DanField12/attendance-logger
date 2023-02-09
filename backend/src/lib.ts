@@ -129,3 +129,10 @@ export function adminLogIn(password: string) {
   }
   throw HTTPError(403, 'incorrect password');
 }
+
+export function validSession(sessionId: string) {
+  console.log(sessionId)
+  let sessions = getSessions();
+  if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
+  return {};
+}

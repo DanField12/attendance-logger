@@ -2,7 +2,7 @@ import express, { json } from 'express';
 import path from 'path';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
-import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
+import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll, validSession } from './lib';
 import { fullName } from './types';
 import { getPeople } from './people';
 import { PrintQueue } from './print';
@@ -61,6 +61,11 @@ app.post("/admin/login/password", (req, res) => {
   const { password } = req.body;
   res.json(adminLogIn(password));
 });
+
+app.post("/admin/validSession", (req, res) => {
+  const sessionId = req.get('sessionId') as string
+  res.json(validSession(sessionId))
+})
 
 app.get("/csv", (req, res) => {
   const sessionId = req.get('sessionId') as string
