@@ -1,5 +1,6 @@
 import express, { json } from 'express';
 import path from 'path';
+import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
 import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll } from './lib';
 import { fullName } from './types';
@@ -11,6 +12,8 @@ const app = express()
 app.use(json());
 
 app.use(errorHandler());
+
+app.use(cors());
 
 let printQueue = new PrintQueue();
 
@@ -73,6 +76,7 @@ app.delete("/clear", (req, res) => {
 
 app.post("/member/regular", (req, res) => {
   let { firstname, lastname } = req.body;
+  console.log(firstname, lastname);
   res.json(memberRegular(firstname, lastname, printQueue));
 });
 
