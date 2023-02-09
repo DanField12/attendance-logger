@@ -19,6 +19,7 @@ r1.question('Enter the new password: ', password => {
       console.log('The passwords do not match.');
     } else {
       fs.writeFileSync(path.join(__dirname, '../hashed-password'), doHash(password));
+      fs.writeFileSync(path.join(__dirname, '../sessions.json'), '{"sessions":[]}');
       console.log('The new password has been set');
     }
     r1.close();
