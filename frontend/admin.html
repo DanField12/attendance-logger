@@ -106,9 +106,17 @@
         }, 5000);
     </script>
     <script>
-      if (!localStorage.getItem('sessionId')) {
-        window.location.assign('/admin/login');
-      }
+      
+      const sessionId = localStorage.getItem('sessionId');
+      
+      (async () => {
+        let response = await fetch('/admin/validSession', {
+            method: "POST",
+            headers: { sessionId }
+        })
+          .then(response => response.json())
+          .catch(err => window.location.assign('/admin/login'))
+      })();
 
       download = (text, filename) => {
         const link = document.createElement('a');
@@ -121,22 +129,17 @@
 
       getCSV = async (before, after, name) => {
         let response = await fetch(`/csv?before=${before}&after=${after}`, {
-            headers: {
-                sessionId: localStorage.getItem('sessionId'),
-            }
+            headers: { sessionId }
         })
           .then(response => response.json())
           .then(result => download(result.text, name + '.csv'))
           .catch(err => console.log(err))
       };
-    </script>
-    <script>
+
       clearData = async () => {
         let response = await fetch(`/clear`, {
           method: 'DELETE',
-          headers: {
-            sessionId: localStorage.getItem('sessionId'),
-          }
+          headers: { sessionId }
         })
           .then(response => response.json())
           .catch(err => console.log(err))
