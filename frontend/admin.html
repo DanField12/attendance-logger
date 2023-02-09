@@ -34,9 +34,28 @@
             <div class="btn-group" role="group" aria-label="csv download Buttons">
               <button onclick="getCSV(7, 9, '8')" class="btn btn-outline-primary">8am</button>
               <button onclick="getCSV(9, 11, '10')" class="btn btn-outline-primary">10am</button>
-              <button onclick="getCSV(0, 23, '5_15')" class="btn btn-outline-primary">5:15pm</button>
+              <button onclick="getCSV(16, 18, '5_15')" class="btn btn-outline-primary">5:15pm</button>
             </div>
-            <button onclick="clearData()" class="btn btn-outline-danger">Clear</button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#warningModal">Clear</button>
+            <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Warning</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to clear this?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button onclick="clearData()"  type="button" class="btn btn-danger" data-bs-dismiss="modal">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          
           </div>
           <div class="col-8">
             <h3>All New (First Time) Attendees</h3>

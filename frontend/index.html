@@ -127,7 +127,11 @@
           body: JSON.stringify(payload)
         })
           .then(response => response.json())
-          .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thanks ${payload.firstname} for signing in!</p>`)
+          .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thanks ${payload.firstname} for signing in!</p>
+          <p>Have you signed in the rest of your family?</p>
+          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>  
+            
+          `)
           .catch((err) => {
             alertSignIn.innerHTML = `
             <div class="alert alert-danger" role="alert">
