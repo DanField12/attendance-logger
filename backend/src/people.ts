@@ -3,6 +3,9 @@ import { fullName } from "./types";
 import { key } from './elvanto-api-key.json'
 import HTTPError from 'http-errors';
 
+/**
+ * Gets all people from the elvanto api. If it can't connect, it throws an Error.
+ */
 export async function getPeople(): Promise<fullName[]> {
   let people: fullName[] = [];
   let i = 1;

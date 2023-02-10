@@ -3,7 +3,7 @@ Run this script using 'npm run admin' to set a new admin password. This creates 
 hashed password, which will then be read when a user tries to sign in.
 */ 
 
-import { doHash } from "../lib";
+import { doHash } from "../attendance";
 import readline from 'readline';
 import fs from 'fs';
 import path from "path";

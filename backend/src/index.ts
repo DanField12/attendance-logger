@@ -2,10 +2,11 @@ import express, { json } from 'express';
 import path from 'path';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
-import { adminLogIn, clear, csv, memberNew, memberRegular, newGetAll, regularGetAll, validSession } from './lib';
-import { fullName } from './types';
+import { memberNew, memberRegular, newGetAll, regularGetAll } from './attendance';
+import { attendee, fullName } from './types';
 import { getPeople } from './people';
 import { PrintQueue } from './print';
+import { adminLogIn, clear, csv, validSession } from './admin';
 
 const app = express()
 
@@ -31,6 +32,9 @@ async () => {
     return [];
   });
 }, 2000);
+
+
+let adultAttendees: attendee[] = [];
 
 // frontend routes
 app.get("/", (req, res) => {
@@ -71,27 +75,27 @@ app.get("/csv", (req, res) => {
   const sessionId = req.get('sessionId') as string
   const before = parseInt(req.query.before as string);
   const after = parseInt(req.query.after as string);
-  res.json(csv(sessionId, before, after));
+  res.json(csv(sessionId, before, after, adultAttendees));
 });
 
 app.delete("/clear", (req, res) => {
   const sessionId = req.get('sessionId') as string
-  res.json(clear(sessionId));
+  res.json(clear(sessionId, adultAttendees));
 });
 
 app.post("/member/regular", (req, res) => {
   let { firstname, lastname } = req.body;
   console.log(firstname, lastname);
-  res.json(memberRegular(firstname, lastname, printQueue));
+  res.json(memberRegular(firstname, lastname, printQueue, adultAttendees));
 });
 
 app.get("/member/regular/getAll", (req, res) => {
-  res.json(regularGetAll());
+  res.json(regularGetAll(adultAttendees));
 });
 
 app.post("/member/new", async (req, res) => {
   let { firstname, lastname, contact } = req.body;
-  memberNew(firstname, lastname, contact)
+  memberNew(firstname, lastname, contact, adultAttendees)
     .then(() => {
       people.push({ firstname, lastname })
       printQueue.push(firstname + ',' + lastname);
