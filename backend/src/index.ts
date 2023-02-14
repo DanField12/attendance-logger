@@ -21,17 +21,17 @@ let printQueue = new PrintQueue();
 // Retry until a connection can be made to the alvanto api.
 let people: fullName[] = [];
 let intervalId = setInterval(
-async () => {
-  people = await getPeople()
-  .then((res) => {
-    clearInterval(intervalId);
-    return res;
-  })
-  .catch(err => { 
-    console.log(err);
-    return [];
-  });
-}, 2000);
+  async () => {
+    people = await getPeople()
+      .then((res) => {
+        clearInterval(intervalId);
+        return res;
+      })
+      .catch(err => {
+        console.log(err);
+        return [];
+      });
+  }, 2000);
 
 
 let adultAttendees: attendee[] = [];
