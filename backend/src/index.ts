@@ -53,6 +53,16 @@ app.get("/admin", (req, res) => {
 });
 
 // backend routes
+app.get("/familyMembers", (req, res) => {
+  res.json({
+    family: [
+      "Bob Smith",
+      "John Smith",
+      "Sarah Smith"
+    ]
+  })
+})
+
 app.get("/people", (req, res) => {
   if (people.length === 0) {
     res.status(500).send()
