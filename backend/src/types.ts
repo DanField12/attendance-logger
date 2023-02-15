@@ -1,10 +1,12 @@
 export interface attendee {
+  id: string,
   firstname: string,
   lastname: string,
   date: Date,
 }
 
 export interface newMember {
+  id: string,
   firstname: string,
   lastname: string,
   email: string,
@@ -13,6 +15,8 @@ export interface newMember {
 }
 
 export interface fullName {
+  id: string,
   firstname: string,
   lastname: string,
+  familyId: string,
 }

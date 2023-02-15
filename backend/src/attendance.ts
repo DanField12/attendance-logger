@@ -1,4 +1,4 @@
-import { attendee, newMember } from './types';
+import { attendee, fullName, newMember } from './types';
 import HTTPError from 'http-errors';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -14,16 +14,11 @@ export function doHash(text: string): string {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
-export function memberRegular(firstname: string, lastname: string, printQueue: PrintQueue, adultAttendees: attendee[]) {
-  if (firstname === '' || firstname === undefined) throw HTTPError(400, 'firstname is invalid');
-  if (lastname === '' || lastname === undefined) throw HTTPError(400, 'lastname is invalid');
-  for (let attendee of adultAttendees) {
-    if (attendee.firstname === firstname && attendee.lastname === lastname) {
-      throw HTTPError(400, 'user has already signed in');
-    }
-  }
+export function memberRegular(id: string, printQueue: PrintQueue, adultAttendees: attendee[], people: Map<string, fullName>) {
+  if (!people.has(id)) throw HTTPError(403, 'Invalid id.');
+  const { firstname, lastname } = people.get(id);
   printQueue.push(firstname + ',' + lastname);
-  adultAttendees.push({ firstname, lastname, date: new Date()});
+  adultAttendees.push({ id, firstname, lastname, date: new Date()});
   console.log(adultAttendees);
   return {};
 }
@@ -88,6 +83,6 @@ export async function memberNew(firstname: string, lastname: string, contact: st
     throw HTTPError(500, 'Error connecting to elvanto in addPerson');
   });
 
-  adultAttendees.push({firstname, lastname, date: new Date()});
+  adultAttendees.push({ id: personId, firstname, lastname, date: new Date()});
   newMembers.push({...payload, date: new Date()});
 }

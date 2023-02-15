@@ -6,8 +6,8 @@ import HTTPError from 'http-errors';
 /**
  * Gets all people from the elvanto api. If it can't connect, it throws an Error.
  */
-export async function getPeople(): Promise<fullName[]> {
-  let people: fullName[] = [];
+export async function getPeople(): Promise<Map<string, fullName>> {
+  let people = new Map<string, fullName>();
   let i = 1;
   while (true) {
     let result = await axios.get(`https://api.elvanto.com/v1/people/getAll.json?page=${i}`, {
@@ -15,7 +15,7 @@ export async function getPeople(): Promise<fullName[]> {
     })
     .then(async (result) => {
       for (let person of await result.data.people.person) {
-        people.push({ firstname: person.firstname, lastname: person.lastname })
+        people.set(person.id, { id: person.id, firstname: person.firstname, lastname: person.lastname, familyId: person.family_id })
       }
       return result;
     })
@@ -24,4 +24,13 @@ export async function getPeople(): Promise<fullName[]> {
     if (result.data.people.on_this_page < 1000) break;
   }
   return people;
+}
+
+export function getFamily(id: string, people: Map<string, fullName>) {
+  if (!people.has(id)) throw HTTPError(403, 'Invalid id.');
+  const familyId = people.get(id).familyId;
+  if (familyId === "") return {};
+  return {
+    family: Array.from(people.values()).filter(person => familyId === person.familyId && id !== person.id)
+  }
 }

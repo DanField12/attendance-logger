@@ -4,7 +4,7 @@ import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
 import { memberNew, memberRegular, newGetAll, regularGetAll } from './attendance';
 import { attendee, fullName } from './types';
-import { getPeople } from './people';
+import { getFamily, getPeople } from './people';
 import { PrintQueue } from './print';
 import { adminLogIn, clear, csv, validSession } from './admin';
 
@@ -19,20 +19,22 @@ app.use(cors());
 let printQueue = new PrintQueue();
 
 // Retry until a connection can be made to the alvanto api.
-let people: fullName[] = [];
-let intervalId = setInterval(
-async () => {
-  people = await getPeople()
-  .then((res) => {
-    clearInterval(intervalId);
-    return res;
-  })
-  .catch(err => { 
-    console.log(err);
-    return [];
-  });
-}, 2000);
-
+let people = new Map<string, fullName>();
+function peopleRequest() {
+  let intervalId = setInterval(
+  async () => {
+    people = await getPeople()
+    .then((res) => {
+      clearInterval(intervalId);
+      return res;
+    })
+    .catch(err => { 
+      console.log(err);
+      return people;
+    });
+  }, 2000);
+}
+peopleRequest();
 
 let adultAttendees: attendee[] = [];
 
@@ -54,20 +56,15 @@ app.get("/admin", (req, res) => {
 
 // backend routes
 app.get("/familyMembers", (req, res) => {
-  res.json({
-    family: [
-      "Bob Smith",
-      "John Smith",
-      "Sarah Smith"
-    ]
-  })
+  const id = req.query.id as string;
+  res.json(getFamily(id, people))
 })
 
 app.get("/people", (req, res) => {
-  if (people.length === 0) {
+  if (people.size === 0) {
     res.status(500).send()
   } else {
-    res.json({ people });
+    res.json({ people: Array.from(people.values()).map(person => ({ id: person.id, firstname: person.firstname, lastname: person.lastname })) });
   }
 });
 
@@ -94,9 +91,9 @@ app.delete("/clear", (req, res) => {
 });
 
 app.post("/member/regular", (req, res) => {
-  let { firstname, lastname } = req.body;
-  console.log(firstname, lastname);
-  res.json(memberRegular(firstname, lastname, printQueue, adultAttendees));
+  let { id } = req.body;
+  console.log(id);
+  res.json(memberRegular(id, printQueue, adultAttendees, people));
 });
 
 app.get("/member/regular/getAll", (req, res) => {
@@ -106,10 +103,10 @@ app.get("/member/regular/getAll", (req, res) => {
 app.post("/member/new", async (req, res) => {
   let { firstname, lastname, contact } = req.body;
   memberNew(firstname, lastname, contact, adultAttendees)
-    .then(() => {
-      people.push({ firstname, lastname })
+    .then((result) => {
+      peopleRequest();
       printQueue.push(firstname + ',' + lastname);
-      res.json({});
+      res.json(result);
     })
     .catch((err) => {
       res.status(500).send();
