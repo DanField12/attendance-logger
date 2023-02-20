@@ -21,8 +21,8 @@
     <div id="signInForm">
       <div class="container" style="padding-top: 30vh;" id="startButtons">
         <div style="padding: 0.3vw;">
-          <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#regular"
-            aria-expanded="false" aria-controls="regular">
+          <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse"
+            data-bs-target="#regularMember" aria-expanded="false" aria-controls="regularMember">
             I'm A Regular
           </button>
         </div>
@@ -34,27 +34,22 @@
         </div>
       </div>
 
-      <div class="collapse" id="regular">
+      <div class="collapse" id="regularMember">
         <form id="regularForm">
           <div class="mb-3">
-            <input type="text" class="form-control" placeholder="First Name" id="regularFirstName" required>
+            <input type="text" class="form-control" placeholder="First Name" id="regularMemberFirstName" required>
           </div>
           <div class="mb-3">
-            <input type="text" class="form-control" placeholder="Last Name" id="regularLastName" required>
+            <input type="text" class="form-control" placeholder="Last Name" id="regularMemberLastName" required>
           </div>
-          <!-- <div class="mb-3">
-            <input type="text" class="form-control" id="nameInput" autocomplete="off"
-              placeholder="Please enter your full name" data-bs-toggle="dropdown" required>
-            <div>
-              <ul class="dropdown-menu overflow-scroll" id="dropdownNamesMenu" style="max-height: 60vh;"></ul>
-            </div>
-          </div> -->
           <div id="alertSignIn"></div>
-          <div id="regularNameStatus"></div>
+          <div id="regularMemberNameStatus"></div>
+          <div id="regularMemberFamilyPrompt"></div>
+          <div id="regularMemberFamilyCheckboxes"></div>
           <br>
           <div>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regular"
-              aria-expanded="false" aria-controls="regular">Back</button>
+            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#regularMember"
+              aria-expanded="false" aria-controls="regularMember">Back</button>
             <button type="submit" class="btn btn-primary" id="submitRegular" disabled>Print A Name Tag</button>
           </div>
         </form>
@@ -85,8 +80,8 @@
   </div>
 
   <script>
-    regular.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
-    regular.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
+    regularMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
+    regularMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
     newMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
     newMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
   </script>
@@ -105,69 +100,82 @@
         .catch(err => {
           alertSignIn.innerHTML = `
               <div class="alert alert-danger" role="alert">
-                  Something went wrong, please try again later.
+                  Could not fetch church members, please try again later.
               </div>`;
         });
-      console.log(names)
+      //console.log(names)
 
-      const regularFirstNameElement = document.getElementById('regularFirstName');
-      const regularLastNameElement = document.getElementById('regularLastName');
-      const regularNameStatusElement = document.getElementById('regularNameStatus')
-
-      regularFirstNameElement.addEventListener('input', getRegularFirstName);
-      regularLastNameElement.addEventListener('input', getRegularLastName);
-
-      function getRegularFirstName(e) {
-        globalFirstname = e.target.value;
-        isRegularNameInDatabase(globalFirstname, globalLastname);
-      }
-
-      function getRegularLastName(e) {
-        globalLastname = e.target.value;
-        isRegularNameInDatabase(globalFirstname, globalLastname);
-      }
-
-      function isRegularNameInDatabase(regularFirstname, regularLastname) {
-        let regularFullname = (regularFirstname + ' ' + regularLastname).toLowerCase();
-        let name = names.find(name => name.fullname.toLowerCase() === regularFullname);
-        if (name !== undefined) {
-          globalId = name.id;
-          regularNameStatusElement.textContent = regularFirstname + ' ' + regularLastname + ' was found in the church database';
-          submitRegular.disabled = false;
-        } else {
-          regularNameStatusElement.textContent = '';
-          submitRegular.disabled = true;
+      async function fetchFamilyMembers(personID) {
+        try {
+          const response = await fetch('/familyMembers?' + new URLSearchParams({
+            id: personID
+          }));
+          if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+          const data = await response.json();
+          return data;
+        }
+        catch (error) {
+          console.error(`Could not fetch family members: ${error}`);
         }
       }
 
-      // nameInput.addEventListener('input', event => {
-      //   document.getElementById('dropdownNamesMenu').innerHTML = names
-      //     .filter(name => name.fullname.toLowerCase().includes(nameInput.value.toLowerCase()))
-      //     .map(name => `<li><a class="dropdown-item" href="#" onclick="clickName('${name.firstname}', '${name.lastname}', '${name.fullname}')">${name.fullname}</a></li>`)
-      //     .join(' ');
+      const regularMemberFirstNameElement = document.getElementById('regularMemberFirstName');
+      const regularMemberLastNameElement = document.getElementById('regularMemberLastName');
+      const regularMemberFamilyCheckboxesElement = document.getElementById('regularMemberFamilyCheckboxes')
+      
+      regularMemberFirstNameElement.addEventListener('input', getRegularMemberFirstName);
+      regularMemberLastNameElement.addEventListener('input', getRegularMemberLastName);
 
-      //   const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
-      //   const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
-      // let name = names.find(name => name.fullname === nameInput.value)
-      // if (name !== undefined) {
-      //   autocomplete(name.firstname, name.lastname);
-      // } else {
-      //   submitRegular.disabled = true;
-      // }
+      function getRegularMemberFirstName(e) {
+        globalFirstname = e.target.value;
+        isRegularMemberInDatabase(globalFirstname, globalLastname);
+      }
 
-      // });
+      function getRegularMemberLastName(e) {
+        globalLastname = e.target.value;
+        isRegularMemberInDatabase(globalFirstname, globalLastname);
+      }
+
+      function isRegularMemberInDatabase(firstname, lastname) {
+        let fullname = (firstname + ' ' + lastname).toLowerCase();
+        let name = names.find(name => name.fullname.toLowerCase() === fullname);
+        if (name !== undefined) {
+          globalId = name.id;
+          regularMemberNameStatus.innerHTML = `<br>
+            <div class="alert alert-primary" role="alert">
+              ${firstname.charAt(0).toUpperCase() + firstname.slice(1)} ${lastname.charAt(0).toUpperCase() + lastname.slice(1)} was found in the church database.
+            </div>`
+
+          submitRegular.disabled = false;
+
+          const promiseFamilyMembers = fetchFamilyMembers(globalId);
+          promiseFamilyMembers.then(
+            (data) => {
+              if (data.family.length > 0) {
+                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-secondary" role="alert">Please check-in family members:</div>`;                              
+
+                var buildFamilyMembersCheckboxes = `<div class="form-check form-check-inline">`;
+                for (f in data.family) {
+                  buildFamilyMembersCheckboxes = buildFamilyMembersCheckboxes +
+                  `<input class="form-check-input" type="checkbox" value="" id=${data.family[f].id}>
+                    <label class="form-check-label" for="flexCheckDefault">
+                      ${data.family[f].firstname} ${data.family[f].lastname}
+                    </label><br>`
+                }
+                regularMemberFamilyCheckboxes.innerHTML = buildFamilyMembersCheckboxes + `</div><br><br>`;
+              }
+            }
+          );
+        } else {
+          regularMemberNameStatus.innerHTML = ``;
+          regularMemberFamilyPrompt.innerHTML = ``;
+          regularMemberFamilyCheckboxes.innerHTML = ``;
+          submitRegular.disabled = true;
+        }
+      }
     })();
-
-    // function autocomplete(firstname, lastname) {
-    //   submitRegular.disabled = false;
-    //   globalFirstname = firstname;
-    //   globalLastname = lastname;
-    // }
-
-    // function clickName(firstname, lastname, fullname) {
-    //   autocomplete(firstname, lastname);
-    //   nameInput.value = fullname;
-    // }
 
     postInfo = async (endPoint, payload) => {
       await fetch(endPoint, {
