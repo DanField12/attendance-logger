@@ -5,3 +5,4 @@ obj
 hashed-password
 .vscode/launch.json
 backend/src/sessions.json
+backend/src/elvanto-api-key.json
