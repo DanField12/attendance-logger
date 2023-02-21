@@ -17,7 +17,7 @@
   <div class="container text-center">
     <br>
     <h1>Welcome to St David's</h1>
-
+    <br>
     <div id="signInForm">
       <div class="container" style="padding-top: 30vh;" id="startButtons">
         <div style="padding: 0.3vw;">
@@ -124,7 +124,7 @@
 
       const regularMemberFirstNameElement = document.getElementById('regularMemberFirstName');
       const regularMemberLastNameElement = document.getElementById('regularMemberLastName');
-      
+
       regularMemberFirstNameElement.addEventListener('input', getRegularMemberFirstName);
       regularMemberLastNameElement.addEventListener('input', getRegularMemberLastName);
 
@@ -154,12 +154,12 @@
           promiseFamilyMembers.then(
             (data) => {
               if (data.family.length > 0) {
-                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:</div>`;                              
+                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:</div>`;
 
                 var buildFamilyMembersCheckboxes = `<div class="form-check form-check-inline">`;
                 for (f in data.family) {
                   buildFamilyMembersCheckboxes = buildFamilyMembersCheckboxes +
-                  `<input class="form-check-input" type="checkbox" value="" id=${data.family[f].id}>
+                    `<input class="form-check-input" type="checkbox" value="" id=${data.family[f].id}>
                     <label class="form-check-label" for="flexCheckDefault">
                       ${data.family[f].firstname} ${data.family[f].lastname}
                     </label><br>`
