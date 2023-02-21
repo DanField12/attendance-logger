@@ -90,6 +90,7 @@
     let globalFirstname = '';
     let globalLastname = '';
     let globalId = '';
+    let globalFamilyMemberIds = [];
 
     (async () => {
       let names = await fetch('/people')
@@ -100,10 +101,10 @@
         .catch(err => {
           alertSignIn.innerHTML = `
               <div class="alert alert-danger" role="alert">
-                  Could not fetch church members, please try again later.
+                  Could not fetch church members! Please try again later.
               </div>`;
         });
-      //console.log(names)
+      // console.log(names)
 
       async function fetchFamilyMembers(personID) {
         try {
@@ -123,7 +124,6 @@
 
       const regularMemberFirstNameElement = document.getElementById('regularMemberFirstName');
       const regularMemberLastNameElement = document.getElementById('regularMemberLastName');
-      const regularMemberFamilyCheckboxesElement = document.getElementById('regularMemberFamilyCheckboxes')
       
       regularMemberFirstNameElement.addEventListener('input', getRegularMemberFirstName);
       regularMemberLastNameElement.addEventListener('input', getRegularMemberLastName);
@@ -144,7 +144,7 @@
         if (name !== undefined) {
           globalId = name.id;
           regularMemberNameStatus.innerHTML = `<br>
-            <div class="alert alert-primary" role="alert">
+            <div class="alert alert-secondary" role="alert">
               ${firstname.charAt(0).toUpperCase() + firstname.slice(1)} ${lastname.charAt(0).toUpperCase() + lastname.slice(1)} was found in the church database.
             </div>`
 
@@ -154,7 +154,7 @@
           promiseFamilyMembers.then(
             (data) => {
               if (data.family.length > 0) {
-                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-secondary" role="alert">Please check-in family members:</div>`;                              
+                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:</div>`;                              
 
                 var buildFamilyMembersCheckboxes = `<div class="form-check form-check-inline">`;
                 for (f in data.family) {
@@ -178,6 +178,14 @@
     })();
 
     postInfo = async (endPoint, payload) => {
+      // Get family members (if any)
+      var checkedFamilyMembers = document.querySelectorAll('input[type="checkbox"]:checked');
+      for (var checkedFamilyMember of checkedFamilyMembers) {
+        globalFamilyMemberIds.push(checkedFamilyMember.id);
+      }
+      console.log(globalFamilyMemberIds);
+      console.log(JSON.stringify(payload));
+
       await fetch(endPoint, {
         method: 'POST',
         headers: {
@@ -186,26 +194,24 @@
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
-        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thanks ${payload.firstname} for signing in!</p>
+        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thank you for signing in!</p>
           <p>Have you signed in the rest of your family?</p>
-          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>  
-            
-          `)
+          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>`)
         .catch((err) => {
           alertSignIn.innerHTML = `
             <div class="alert alert-danger" role="alert">
-                Sorry, it looks like you have already signed in.
+                You are already signed in!
             </div>`;
           alertNewSignIn.innerHTML = `
             <div class="alert alert-danger" role="alert">
-                An error occurred, please try again later.
+                An error occurred during Sign In! Please try again later.
             </div>`;
         });
     }
 
     regularForm.onsubmit = async (e) => {
       e.preventDefault();
-      await postInfo('/member/regular', { id: globalId });
+      await postInfo('/member/regulars', { id: globalId, familyIds: globalFamilyMemberIds });
     };
     newMemberForm.onsubmit = async (e) => {
       e.preventDefault();

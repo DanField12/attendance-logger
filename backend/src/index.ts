@@ -2,7 +2,7 @@ import express, { json } from 'express';
 import path from 'path';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
-import { memberNew, memberRegular, newGetAll, regularGetAll } from './attendance';
+import { memberNew, memberRegular, memberRegulars, newGetAll, regularGetAll } from './attendance';
 import { attendee, fullName } from './types';
 import { getFamily, getPeople } from './people';
 import { PrintQueue } from './print';
@@ -94,6 +94,16 @@ app.post("/member/regular", (req, res) => {
   let { id } = req.body;
   console.log(id);
   res.json(memberRegular(id, printQueue, adultAttendees, people));
+});
+
+app.post("/member/regulars", (req, res) => {
+  let { id, familyIds } = req.body;
+  console.log(id);
+  console.log(familyIds);
+  
+  let ids: string[] = [...familyIds];
+  ids.splice(0,0,id);
+  res.json(memberRegulars(ids, printQueue, adultAttendees, people));
 });
 
 app.get("/member/regular/getAll", (req, res) => {

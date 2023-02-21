@@ -23,6 +23,17 @@ export function memberRegular(id: string, printQueue: PrintQueue, adultAttendees
   return {};
 }
 
+export function memberRegulars(ids: string[], printQueue: PrintQueue, adultAttendees: attendee[], people: Map<string, fullName>) {
+  for (const id of ids){
+    if (!people.has(id)) throw HTTPError(403, 'Invalid id.');
+    const { firstname, lastname } = people.get(id);
+    printQueue.push(firstname + ',' + lastname);
+    adultAttendees.push({ id, firstname, lastname, date: new Date()});
+    console.log(adultAttendees);  
+  }
+  return {};
+}
+
 export function regularGetAll(adultAttendees: attendee[]) {
   return { attendees: adultAttendees.map(attendee => {
     return {

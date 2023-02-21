@@ -4,3 +4,4 @@ bin
 obj
 hashed-password
 .vscode/launch.json
+backend/src/sessions.json
