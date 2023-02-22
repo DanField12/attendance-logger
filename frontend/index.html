@@ -194,17 +194,14 @@
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
-        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Thank you for signing in!</p>
+        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Successful sign-in of ${globalFamilyMemberIds.length + 1} member(s).</p>
           <p>Have you signed in the rest of your family?</p>
-          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>`)
+          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>`
+          )
         .catch((err) => {
           alertSignIn.innerHTML = `
             <div class="alert alert-danger" role="alert">
                 You are already signed in!
-            </div>`;
-          alertNewSignIn.innerHTML = `
-            <div class="alert alert-danger" role="alert">
-                An error occurred during Sign In! Please try again later.
             </div>`;
         });
     }

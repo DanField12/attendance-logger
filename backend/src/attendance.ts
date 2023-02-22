@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import axios from "axios";
 import { key } from './elvanto-api-key.json'
 import { PrintQueue } from './print';
+import { fi } from 'date-fns/locale';
 
 let newMembers: newMember[] = [];
 
@@ -24,13 +25,30 @@ export function memberRegular(id: string, printQueue: PrintQueue, adultAttendees
 }
 
 export function memberRegulars(ids: string[], printQueue: PrintQueue, adultAttendees: attendee[], people: Map<string, fullName>) {
-  for (const id of ids){
-    if (!people.has(id)) throw HTTPError(403, 'Invalid id.');
-    const { firstname, lastname } = people.get(id);
-    printQueue.push(firstname + ',' + lastname);
-    adultAttendees.push({ id, firstname, lastname, date: new Date()});
-    console.log(adultAttendees);  
+  var alreadySignedInUsers:string = '';
+  var newSignedInUsers:string = '';
+  var invalidIds:string = '';
+  for (const id of ids) {
+    if (people.has(id)) {
+      const { firstname, lastname } = people.get(id);
+      if (adultAttendees.find(aa => aa.id === id)) {
+        alreadySignedInUsers = alreadySignedInUsers + firstname + ' ' + lastname + '. ';
+      } else {
+        newSignedInUsers = newSignedInUsers + firstname + ' ' + lastname + '. ';
+        printQueue.push(firstname + ',' + lastname);
+        adultAttendees.push({ id, firstname, lastname, date: new Date() });
+      }
+    } else {
+      invalidIds = invalidIds + id + '. ';
+    }
   }
+  if (alreadySignedInUsers !== "") {
+    console.log('WARNING! Already signed-in members: ' + alreadySignedInUsers);
+  }
+  if (invalidIds !== ""){
+    console.log('WARNING! Invalid id(s):' + invalidIds);
+  }
+  console.log(adultAttendees);
   return {};
 }
 
