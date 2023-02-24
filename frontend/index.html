@@ -87,10 +87,13 @@
   </script>
 
   <script>
-    let globalFirstname = '';
-    let globalLastname = '';
-    let globalId = '';
+    let globalFirstname = localStorage.getItem('globalFirstname') ? localStorage.getItem('globalFirstname') : '';
+    let globalLastname = localStorage.getItem('globalLastname') ? localStorage.getItem('globalLastname') : '';
+    let globalId = localStorage.getItem('globalId') ? localStorage.getItem('globalId') : '';
     let globalFamilyMemberIds = [];
+
+    document.getElementById('regularMemberFirstName').value = globalFirstname;
+    document.getElementById('regularMemberLastName').value = globalLastname;
 
     (async () => {
       let names = await fetch('/people')
@@ -104,7 +107,9 @@
                   Could not fetch church members! Please try again later.
               </div>`;
         });
-      // console.log(names)
+
+      // Check the cache and autofill what it can.
+      isRegularMemberInDatabase(globalFirstname, globalLastname);
 
       async function fetchFamilyMembers(personID) {
         try {
@@ -143,6 +148,9 @@
         let name = names.find(name => name.fullname.toLowerCase() === fullname);
         if (name !== undefined) {
           globalId = name.id;
+          localStorage.setItem('globalFirstname', globalFirstname);
+          localStorage.setItem('globalLastname', globalLastname);
+          localStorage.setItem('globalId', globalId);
           regularMemberNameStatus.innerHTML = `<br>
             <div class="alert alert-secondary" role="alert">
               ${firstname.charAt(0).toUpperCase() + firstname.slice(1)} ${lastname.charAt(0).toUpperCase() + lastname.slice(1)} was found in the church database.
@@ -195,8 +203,7 @@
       })
         .then(response => response.json())
         .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Successful sign-in of ${globalFamilyMemberIds.length + 1} member(s).</p>
-          <p>Have you signed in the rest of your family?</p>
-          <a href=""><button type="submit" class="btn btn-primary">Sign In Others</button></a>`
+          <a href=""><button type="submit" class="btn btn-secondary">Back</button></a>`
           )
         .catch((err) => {
           alertSignIn.innerHTML = `
