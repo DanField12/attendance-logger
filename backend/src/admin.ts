@@ -16,15 +16,13 @@ export function csv(sessionId: string, before: number, after: number, adultAtten
   let sessions = getSessions();
   if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
 
-  let beforeDate = new Date();
-  beforeDate.setHours(before);
-  beforeDate.setMinutes(0);
-  let afterDate = new Date();
-  afterDate.setHours(after);
-  afterDate.setMinutes(0);
-
   return { text: adultAttendees.reduce(
     (accumulator, curr) => {
+        
+      let beforeDate = new Date(curr.date);
+      beforeDate.setHours(before, 0);
+      let afterDate = new Date(curr.date);
+      afterDate.setHours(after, 0);
       if (curr.date.getTime() > beforeDate.getTime() && curr.date.getTime() < afterDate.getTime()) {
         return `${accumulator}${curr.firstname},${curr.lastname}\n`
       }
@@ -36,7 +34,7 @@ export function csv(sessionId: string, before: number, after: number, adultAtten
 export function clear(sessionId: string, adultAttendees: attendee[]) {
   let sessions = getSessions();
   if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
-  adultAttendees = [];
+  adultAttendees.length = 0;
   return {};
 }
 

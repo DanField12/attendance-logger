@@ -19,7 +19,7 @@ export function memberRegular(id: string, printQueue: PrintQueue, adultAttendees
   if (!people.has(id)) throw HTTPError(403, 'Invalid id.');
   const { firstname, lastname } = people.get(id);
   printQueue.push(firstname + ',' + lastname);
-  adultAttendees.push({ id, firstname, lastname, date: new Date()});
+  adultAttendees.push({ id, firstname, lastname, date: new Date(new Date().toLocaleString("en-GB", {timeZone: "Australia/Sydney"}))});
   console.log(adultAttendees);
   return {};
 }
