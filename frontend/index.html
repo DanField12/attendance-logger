@@ -16,7 +16,7 @@
 
   <div class="container text-center">
     <br>
-    <h1>Welcome to St David's</h1>
+    <h1>Welcome to St David's <div id=serviceTime></div></h1>
     <br>
     <div id="signInForm">
       <div class="container" style="padding-top: 30vh;" id="startButtons">
@@ -37,7 +37,7 @@
       <div class="collapse" id="regularMember">
         <form id="regularForm">
           <div class="mb-3">
-            <input type="text" class="form-control" placeholder="First Name" id="regularMemberFirstName" required>
+            <input type="text" class="form-control" placeholder="First Name" id="regularMemberFirstName" autofocus required>
           </div>
           <div class="mb-3">
             <input type="text" class="form-control" placeholder="Last Name" id="regularMemberLastName" required>
@@ -75,10 +75,19 @@
           </div>
         </form>
       </div>
-
+      </div>
     </div>
   </div>
-
+  <script>
+    let date = new Date();
+    if (date.getHours() > 7 && date.getHours() <= 9) {
+        serviceTime.innerHTML = "8am Gathering";
+    } else if (date.getHours() > 9 && date.getHours() <= 11) {
+        serviceTime.innerHTML = "10am Gathering";
+    } else if (date.getHours() > 4 && date.getHours() <= 6) {
+        serviceTime.innerHTML = "10am Gathering";
+    }
+  </script>
   <script>
     regularMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
     regularMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
@@ -187,10 +196,6 @@
 
     postInfo = async (endPoint, payload) => {
       // Get family members (if any)
-      var checkedFamilyMembers = document.querySelectorAll('input[type="checkbox"]:checked');
-      for (var checkedFamilyMember of checkedFamilyMembers) {
-        globalFamilyMemberIds.push(checkedFamilyMember.id);
-      }
       console.log(globalFamilyMemberIds);
       console.log(JSON.stringify(payload));
 
@@ -200,20 +205,22 @@
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
-      })
+        })
+        .then((response) => { newMember.innerHTML = `<p style="padding-top: 30vh;">Thanks for signing in!</p>
+          <a href=""><button type="submit" class="btn btn-secondary">Back</button></a>`;
+            return response })
         .then(response => response.json())
         .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Successful sign-in of ${globalFamilyMemberIds.length + 1} member(s).</p>
           <a href=""><button type="submit" class="btn btn-secondary">Back</button></a>`
           )
-        .catch((err) => {
-          alertSignIn.innerHTML = `
-            <div class="alert alert-danger" role="alert">
-                You are already signed in!
-            </div>`;
-        });
+        .catch((err) => console.log(err));
     }
 
     regularForm.onsubmit = async (e) => {
+      var checkedFamilyMembers = document.querySelectorAll('input[type="checkbox"]:checked');
+      for (var checkedFamilyMember of checkedFamilyMembers) {
+        globalFamilyMemberIds.push(checkedFamilyMember.id);
+      }
       e.preventDefault();
       await postInfo('/member/regulars', { id: globalId, familyIds: globalFamilyMemberIds });
     };
