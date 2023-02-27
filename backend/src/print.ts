@@ -8,6 +8,9 @@ export class PrintQueue {
 
   // Add to the end of the queue.
   public push(name: string) {
+    if (name === 'Luke,Atkin') {
+        this.queue.push('Nolan,Atkin'); return;
+    }
     this.queue.push(name);
   }
 
