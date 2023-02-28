@@ -15,7 +15,13 @@ export async function getPeople(): Promise<Map<string, fullName>> {
     })
     .then(async (result) => {
       for (let person of await result.data.people.person) {
-        people.set(person.id, { id: person.id, firstname: person.firstname, lastname: person.lastname, familyId: person.family_id })
+        let firstname;
+        if (person.preferred_name !== "" && person.preferred_name.length < person.firstname.length) {
+            firstname = person.preferred_name;
+        } else {
+            firstname = person.firstname;
+        }
+        people.set(person.id, { id: person.id, firstname: firstname, lastname: person.lastname, familyId: person.family_id })
       }
       return result;
     })
