@@ -28,7 +28,7 @@ class Program
     // Set a timer to continuously get names every 5 seconds
     private static void SetTimer(string endpoint)
     {
-        aTimer = new System.Timers.Timer(5000);
+        aTimer = new System.Timers.Timer(1000);
         aTimer.Elapsed += (sender, e) => GetNames(sender, e, endpoint);
         aTimer.AutoReset = true;
         aTimer.Enabled = true;
