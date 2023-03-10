@@ -41,7 +41,12 @@ let adultAttendees: attendee[] = [];
 // frontend routes
 app.get("/", (req, res) => {
   res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '/../../frontend/index.html'));
+  let t = new Date();
+  if (t.getDay() == 0 && t.getHours() >= 16 && t.getHours() < 18) {
+    res.sendFile(path.join(__dirname, '/../../frontend/index.html'));
+  } else {
+    res.sendFile(path.join(__dirname, '/../../frontend/unavailable.html'));
+  }
 });
 
 app.get("/admin/login", (req, res) => {

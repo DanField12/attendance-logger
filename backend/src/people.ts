@@ -15,6 +15,7 @@ export async function getPeople(): Promise<Map<string, fullName>> {
     })
     .then(async (result) => {
       for (let person of await result.data.people.person) {
+        if (person.deceased === 1) continue;
         let firstname;
         if (person.preferred_name !== "" && person.preferred_name.length < person.firstname.length) {
             firstname = person.preferred_name;
@@ -37,6 +38,13 @@ export function getFamily(id: string, people: Map<string, fullName>) {
   const familyId = people.get(id).familyId;
   if (familyId === "") return {};
   return {
-    family: Array.from(people.values()).filter(person => familyId === person.familyId && id !== person.id)
+    family: Array.from(people.values())
+                    .filter(person => familyId === person.familyId && id !== person.id)
+                    .map(person => ({ 
+                        id: person.id,
+                        firstname: person.firstname.slice(0, 2) + "*".repeat(person.firstname.length - 2),
+                        lastname: "*".repeat(person.lastname.length),
+                        familyId: familyId 
+                    }))
   }
 }
