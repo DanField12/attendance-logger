@@ -1,6 +1,7 @@
 import HTTPError from 'http-errors';
 import fs from 'fs';
 import path from 'path';
+import { format } from 'date-fns'
 import { doHash } from './attendance';
 import { attendee } from './types';
 
@@ -24,7 +25,7 @@ export function csv(sessionId: string, before: number, after: number, adultAtten
       let afterDate = new Date(curr.date);
       afterDate.setHours(after, 0);
       if (curr.date.getTime() > beforeDate.getTime() && curr.date.getTime() < afterDate.getTime()) {
-        return `${accumulator}${curr.firstname},${curr.lastname}\n`
+        return `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} 05:15 PM, 515pm Gathering\n`
       }
       return accumulator;
     }, ""
