@@ -17,7 +17,7 @@ export function csv(sessionId: string, before: number, after: number, adultAtten
   let sessions = getSessions();
   if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
 
-  return { text: adultAttendees.reduce(
+  return { text: 'First Name,Last Name,Service Date & Time,Location\n' + adultAttendees.reduce(
     (accumulator, curr) => {
         
       let beforeDate = new Date(curr.date);
@@ -25,7 +25,7 @@ export function csv(sessionId: string, before: number, after: number, adultAtten
       let afterDate = new Date(curr.date);
       afterDate.setHours(after, 0);
       if (curr.date.getTime() > beforeDate.getTime() && curr.date.getTime() < afterDate.getTime()) {
-        return `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} 05:15 PM, 515pm Gathering\n`
+        return `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} 05:15 PM,515pm Gathering\n`
       }
       return accumulator;
     }, ""
