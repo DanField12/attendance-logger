@@ -161,7 +161,7 @@
           localStorage.setItem('globalId', globalId);
           regularMemberNameStatus.innerHTML = `<br>
             <div class="alert alert-secondary" role="alert">
-              Welcome Back ${firstname.charAt(0).toUpperCase() + firstname.slice(1)} ${lastname.charAt(0).toUpperCase() + lastname.slice(1)}!
+              Welcome back ${firstname.charAt(0).toUpperCase() + firstname.slice(1)} ${lastname.charAt(0).toUpperCase() + lastname.slice(1)}!
             </div>`
 
           submitRegular.disabled = false;
@@ -170,7 +170,7 @@
           promiseFamilyMembers.then(
             (data) => {
               if (data.family.length > 0) {
-                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:<br>For privacy reasons the names have been blurred.</div>`;
+                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:<br>For privacy reasons the names have been blurred put will print properly.</div>`;
 
                 var buildFamilyMembersCheckboxes = `<div class="form-check form-check-inline">`;
                 for (f in data.family) {
