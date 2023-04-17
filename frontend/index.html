@@ -23,13 +23,13 @@
         <div style="padding: 0.3vw;">
           <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse"
             data-bs-target="#regularMember" aria-expanded="false" aria-controls="regularMember">
-            I'm A Regular
+            Been Before
           </button>
         </div>
         <div style="padding: 0.3vw;">
           <button class="btn btn-primary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#newMember"
             aria-expanded="false" aria-controls="newMember">
-            I'm New Here
+            First Time Here
           </button>
         </div>
       </div>
@@ -79,12 +79,12 @@
   </div>
   <script>
     let date = new Date();
-    if (date.getHours() > 7 && date.getHours() <= 9) {
+    if (date.getHours() >= 7 && date.getHours() <= 9) {
         serviceTime.innerHTML = "8am Gathering";
-    } else if (date.getHours() > 9 && date.getHours() <= 11) {
+    } else if (date.getHours() >= 9 && date.getHours() <= 11) {
         serviceTime.innerHTML = "10am Gathering";
-    } else if (date.getHours() > 4 && date.getHours() <= 6) {
-        serviceTime.innerHTML = "10am Gathering";
+    } else if (date.getHours() >= 16 && date.getHours() <= 18) {
+        serviceTime.innerHTML = "5:15pm Gathering";
     }
   </script>
   <script>
@@ -152,7 +152,7 @@
       }
 
       function isRegularMemberInDatabase(firstname, lastname) {
-        let fullname = (firstname + ' ' + lastname).toLowerCase();
+        let fullname = (firstname.trim() + ' ' + lastname.trim()).toLowerCase();
         let name = names.find(name => name.fullname.toLowerCase() === fullname);
         if (name !== undefined) {
           globalId = name.id;

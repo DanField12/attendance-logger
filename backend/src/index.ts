@@ -42,7 +42,7 @@ let adultAttendees: attendee[] = [];
 app.get("/", (req, res) => {
   res.set('Content-Type', 'text/html');
   let t = new Date();
-  if (t.getDay() == 0 && t.getHours() >= 16 && t.getHours() < 18) {
+  if (t.getDay() == 0 && ((t.getHours() >= 16 && t.getHours() < 18) || (t.getHours() >= 7 && t.getHours() < 9))) {
     res.sendFile(path.join(__dirname, '/../../frontend/index.html'));
   } else {
     res.sendFile(path.join(__dirname, '/../../frontend/unavailable.html'));
