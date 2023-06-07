@@ -91,7 +91,7 @@ export async function memberNew(firstname: string, lastname: string, contact: st
   if (contact.includes('@')) {
     payload = { firstname, lastname, email: contact }
   } else {
-    payload = { firstname, lastname, phone: contact }
+    payload = { firstname, lastname, mobile: contact }
   }
 
   let personId = await axios.post('https://api.elvanto.com/v1/people/create.json', 
