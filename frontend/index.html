@@ -23,7 +23,7 @@
         <div style="padding: 0.3vw;">
           <button class="btn btn-secondary btn-lg" type="button" data-bs-toggle="collapse"
             data-bs-target="#regularMember" aria-expanded="false" aria-controls="regularMember">
-            Been Before
+            Great to be Back
           </button>
         </div>
         <div style="padding: 0.3vw;">
@@ -78,23 +78,22 @@
     </div>
   </div>
   <script>
+    let globalService;
     let date = new Date();
-    if (date.getHours() >= 7 && date.getHours() <= 9) {
-        serviceTime.innerHTML = "8am Gathering";
-    } else if (date.getHours() >= 9 && date.getHours() <= 11) {
-        serviceTime.innerHTML = "10am Gathering";
-    } else if (date.getHours() >= 16 && date.getHours() <= 18) {
-        serviceTime.innerHTML = "5:15pm Gathering";
+    if (date.getHours() >= 7 && date.getHours() < 9) {
+        globalService = "8am";
+    } else if (date.getHours() >= 9 && date.getHours() < 11) {
+        globalService = "10am";
+    } else if (date.getHours() >= 16 && date.getHours() < 18) {
+        globalService = "5:15pm";
     }
-  </script>
-  <script>
+    serviceTime.innerHTML = globalService + " Gathering";
+
     regularMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
     regularMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
     newMember.addEventListener('show.bs.collapse', event => startButtons.hidden = true);
     newMember.addEventListener('hidden.bs.collapse', event => startButtons.hidden = false);
-  </script>
 
-  <script>
     let globalFirstname = localStorage.getItem('globalFirstname') ? localStorage.getItem('globalFirstname') : '';
     let globalLastname = localStorage.getItem('globalLastname') ? localStorage.getItem('globalLastname') : '';
     let globalId = localStorage.getItem('globalId') ? localStorage.getItem('globalId') : '';
@@ -170,7 +169,7 @@
           promiseFamilyMembers.then(
             (data) => {
               if (data.family.length > 0) {
-                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:<br>For privacy reasons the names have been blurred put will print properly.</div>`;
+                regularMemberFamilyPrompt.innerHTML = `<div class="alert alert-primary" role="alert">Please check-in any family members that are also attending:<br>For privacy reasons the names have been blurred but will print properly.</div>`;
 
                 var buildFamilyMembersCheckboxes = `<div class="form-check form-check-inline">`;
                 for (f in data.family) {
@@ -205,11 +204,11 @@
         },
         body: JSON.stringify(payload)
         })
-        .then((response) => { newMember.innerHTML = `<p style="padding-top: 30vh;">Thanks for signing in!</p>
+        .then((response) => { newMember.innerHTML = `<p style="padding-top: 30vh;">Great to have you join us today!</p>
           <a href=""><button type="submit" class="btn btn-secondary">Back</button></a>`;
             return response })
         .then(response => response.json())
-        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Successful sign-in of ${globalFamilyMemberIds.length + 1} member(s).</p>
+        .then(() => signInForm.innerHTML = `<p style="padding-top: 30vh;">Great to have you join us today!</p>
           <a href=""><button type="submit" class="btn btn-secondary">Back</button></a>`
           )
         .catch((err) => console.log(err));
@@ -221,11 +220,11 @@
         globalFamilyMemberIds.push(checkedFamilyMember.id);
       }
       e.preventDefault();
-      await postInfo('/member/regulars', { id: globalId, familyIds: globalFamilyMemberIds });
+      await postInfo('/member/regulars', { id: globalId, familyIds: globalFamilyMemberIds, service: globalService });
     };
     newMemberForm.onsubmit = async (e) => {
       e.preventDefault();
-      await postInfo('/member/new', { firstname: newFirstName.value, lastname: newLastName.value, contact: contact.value });
+      await postInfo('/member/new', { firstname: newFirstName.value, lastname: newLastName.value, contact: contact.value, service: globalService });
     };
   </script>
 </body>

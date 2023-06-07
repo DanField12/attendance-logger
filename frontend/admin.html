@@ -11,32 +11,64 @@
     <div class="container text-center" style="background-color: white; padding: 2vh;">
         <h1 style="padding: 1vw;">St David's Attendance Admin</h1>
         <div class="row align-items-start">
+
           <div class="col-4">
-            <h3>All Church Service Attendees</h3>
+            <h3>8am Church Service</h3>
             <hr>
             <div class="overflow-scroll", style="height: 60vh;">
             <table class="table">
               <thead>
               <tr>
-                <th scope="col">#</th>          
-                <th scope="col">First Name</th>
-                <th scope="col">Last Name</th>
-                <th scope="col">Time Arrived</th>
-                <th scope="col"></th>
+                <th scope="col">#</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Time Arrived</th><th scope="col"></th>
               </tr>
               </thead>
-              <tbody id="attendeeTable">
+              <tbody id="8am">
               </tbody>
             </table>
             </div>
             <hr>
-            <p>Download the attendance log as a .csv file:</p>
-            <div class="btn-group" role="group" aria-label="csv download Buttons">
-              <button onclick="getCSV(7, 9, '8')" class="btn btn-outline-primary">8am</button>
-              <button onclick="getCSV(9, 11, '10')" class="btn btn-outline-primary">10am</button>
-              <button onclick="getCSV(16, 18, '5_15')" class="btn btn-outline-primary">5:15pm</button>
+            <button onclick="getCSV(7, 9, '8', '8am')" class="btn btn-outline-primary">Download CSV</button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#warningModal" data-bs-service="8am">Clear</button>
+          </div>
+          
+          <div class="col-4">
+            <h3>10am Church Service</h3>
+            <hr>
+            <div class="overflow-scroll", style="height: 60vh;">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">#</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Time Arrived</th><th scope="col"></th>
+              </tr>
+              </thead>
+              <tbody id="10am">
+              </tbody>
+            </table>
             </div>
-            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#warningModal">Clear</button>
+            <hr>
+            <button onclick="getCSV(9, 11, '10', '10am')" class="btn btn-outline-primary">Download CSV</button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#warningModal" data-bs-service="10am">Clear</button>
+          </div>
+          
+          <div class="col-4">
+            <h3>5:15pm Church Service</h3>
+            <hr>
+            <div class="overflow-scroll", style="height: 60vh;">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">#</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Time Arrived</th><th scope="col"></th>
+              </tr>
+              </thead>
+              <tbody id="5:15pm">
+              </tbody>
+            </table>
+            </div>
+            <hr>
+            <button onclick="getCSV(16, 18, '5_15', '5:15pm')" class="btn btn-outline-primary">Download CSV</button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#warningModal" data-bs-service="5:15pm">Clear</button>
+          </div>
+
             <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -49,15 +81,15 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button onclick="clearData()"  type="button" class="btn btn-danger" data-bs-dismiss="modal">Yes</button>
+                    <button id="warningConfirm" type="button" class="btn btn-danger" data-bs-dismiss="modal">Yes</button>
                   </div>
                 </div>
               </div>
             </div>
             
-          
-          </div>
-          <div class="col-8">
+        </div>
+        <br>
+          <div>
             <h3>All New (First Time) Attendees</h3>
             <hr>
             <div class="overflow-scroll", style="height: 60vh;">
@@ -79,8 +111,12 @@
             </div>
         </div>
     </div>
-    </div>
     <script>
+      warningModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        const service = button.getAttribute('data-bs-service');
+        warningConfirm.onclick = () => {clearData(service)}
+      });
       async function updateTable(route, fields, elementId) {
         let response = await fetch(route);
         let result = await response.json();
@@ -89,21 +125,35 @@
                           <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                           <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                         </svg>`
-
-        let table = result.attendees.map((curr, i) => 
-         `<tr>
-            <th scope="row">${i + 1}</th>
-            ${fields.map(field => `<td>${curr[field] ? curr[field] : '-' }</td>`).join('')}
-            <td><a type="button">${trash}</a></td>
-          </tr>`).join('')
+        
+        let table;
+        if (elementId === "newTable") {
+          table = result.attendees.map((curr, i) => 
+            `<tr>
+               <th scope="row">${i + 1}</th>
+               ${fields.map(field => `<td>${curr[field] ? curr[field] : '-' }</td>`).join('')}
+               <td><a type="button" onclick="deleteNew('${curr.firstname}', '${curr.lastname}')">${trash}</a></td>
+             </tr>`).join('')
+        } else {
+          table = result.attendees.map((curr, i) => 
+            `<tr>
+               <th scope="row">${i + 1}</th>
+               ${fields.map(field => `<td>${curr[field] ? curr[field] : '-' }</td>`).join('')}
+               <td><a type="button" onclick="deleteRegular('${elementId}', '${curr.id}')">${trash}</a></td>
+             </tr>`).join('')
+        }
         document.getElementById(elementId).innerHTML = table;
       }
-        updateTable(`/member/regular/getAll`, ['firstname', 'lastname', 'date'], 'attendeeTable');
+        updateTable(`/member/regular/getAll?service=8am`, ['firstname', 'lastname', 'date'], '8am');
+        updateTable(`/member/regular/getAll?service=10am`, ['firstname', 'lastname', 'date'], '10am');
+        updateTable(`/member/regular/getAll?service=5:15pm`, ['firstname', 'lastname', 'date'], '5:15pm');
         updateTable(`/member/new/getAll`, ['firstname', 'lastname', 'email', 'phone', 'date'], 'newTable');
         setInterval(() => {
-            updateTable(`/member/regular/getAll`, ['firstname', 'lastname', 'date'], 'attendeeTable');
+            updateTable(`/member/regular/getAll?service=8am`, ['firstname', 'lastname', 'date'], '8am');
+            updateTable(`/member/regular/getAll?service=10am`, ['firstname', 'lastname', 'date'], '10am');
+            updateTable(`/member/regular/getAll?service=5:15pm`, ['firstname', 'lastname', 'date'], '5:15pm');
             updateTable(`/member/new/getAll`, ['firstname', 'lastname', 'email', 'phone', 'date'], 'newTable');
-        }, 5000);
+        }, 10000);
     </script>
     <script>
       
@@ -127,8 +177,8 @@
         document.body.removeChild(link);
       }
 
-      getCSV = async (before, after, name) => {
-        let response = await fetch(`/csv?before=${before}&after=${after}`, {
+      getCSV = async (before, after, name, service) => {
+        let response = await fetch(`/csv?&service=${service}`, {
             headers: { sessionId }
         })
           .then(response => response.json())
@@ -136,8 +186,28 @@
           .catch(err => console.log(err))
       };
 
-      clearData = async () => {
-        let response = await fetch(`/clear`, {
+      clearData = async (service) => {
+        let response = await fetch(`/clear?service=${service}`, {
+          method: 'DELETE',
+          headers: { sessionId }
+        })
+          .then(response => response.json())
+          .catch(err => console.log(err))
+        window.location.reload();
+      };
+
+      deleteRegular = async (service, id) => {
+        let response = await fetch(`/deleteRegular?service=${service}&id=${id}`, {
+          method: 'DELETE',
+          headers: { sessionId }
+        })
+          .then(response => response.json())
+          .catch(err => console.log(err))
+        window.location.reload();
+      };
+
+      deleteNew = async (firstname, lastname) => {
+        let response = await fetch(`/deleteNew?firstname=${firstname}&lastname=${lastname}`, {
           method: 'DELETE',
           headers: { sessionId }
         })

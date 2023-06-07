@@ -57,6 +57,7 @@ export function regularGetAll(adultAttendees: attendee[]) {
     return {
       firstname: attendee.firstname,
       lastname: attendee.lastname,
+      id: attendee.id,
       date: format(attendee.date, 'H:mm'),
     }
   })};
@@ -93,25 +94,37 @@ export async function memberNew(firstname: string, lastname: string, contact: st
     payload = { firstname, lastname, phone: contact }
   }
 
-  let personId = await axios.post('https://api.elvanto.com/v1/people/create.json', 
-    {...payload, category_id: '0ee3d6b3-d425-4eba-a714-a34b1dfa504e'},
-    { auth: { username: key, password: 'x' }
-  }).then(result => { 
-    console.log(result);
-    return result.data.person.id
-  }).catch(err => { 
-    console.log(err);
-    throw HTTPError(500, 'Error connecting to elvanto in create')
-  });
+//   let personId = await axios.post('https://api.elvanto.com/v1/people/create.json', 
+//     {...payload, category_id: '0ee3d6b3-d425-4eba-a714-a34b1dfa504e'},
+//     { auth: { username: key, password: 'x' }
+//   }).then(result => { 
+//     console.log(result);
+//     return result.data.person.id
+//   }).catch(err => { 
+//     console.log(err);
+//     throw HTTPError(500, 'Error connecting to elvanto in create')
+//   });
 
-  await axios.post('https://api.elvanto.com/v1/peopleFlows/steps/addPerson.json',
-    { step_id: 'c6ca4b16-3e4b-4c97-841b-507e623d4db6', person_id: personId },
-    { auth: { username: key, password: 'x' }
-  }).catch(err => { 
-    console.log(err);
-    throw HTTPError(500, 'Error connecting to elvanto in addPerson');
-  });
+//   await axios.post('https://api.elvanto.com/v1/peopleFlows/steps/addPerson.json',
+//     { step_id: 'c6ca4b16-3e4b-4c97-841b-507e623d4db6', person_id: personId },
+//     { auth: { username: key, password: 'x' }
+//   }).catch(err => { 
+//     console.log(err);
+//     throw HTTPError(500, 'Error connecting to elvanto in addPerson');
+//   });
 
-  adultAttendees.push({ id: personId, firstname, lastname, date: new Date()});
+  adultAttendees.push({ id: "personId", firstname, lastname, date: new Date()});
   newMembers.push({...payload, date: new Date()});
+}
+
+export function deleteNew(firstname: string, lastname: string) {
+    console.log("deleting " + firstname + " " + lastname);
+    const index = newMembers.findIndex(attendee => attendee.firstname === firstname && attendee.lastname === lastname);
+    newMembers.splice(index, 1);
+}
+
+export function deleteRegular(id: string, attendees: attendee[]) {
+    console.log("deleting " + id);
+    const index = attendees.findIndex(attendee => attendee.id === id);
+    attendees.splice(index, 1);
 }

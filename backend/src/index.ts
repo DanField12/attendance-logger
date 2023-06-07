@@ -2,7 +2,7 @@ import express, { json } from 'express';
 import path from 'path';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
-import { memberNew, memberRegular, memberRegulars, newGetAll, regularGetAll } from './attendance';
+import { deleteNew, deleteRegular, memberNew, memberRegular, memberRegulars, newGetAll, regularGetAll } from './attendance';
 import { attendee, fullName } from './types';
 import { getFamily, getPeople } from './people';
 import { PrintQueue } from './print';
@@ -36,13 +36,13 @@ function peopleRequest() {
 }
 peopleRequest();
 
-let adultAttendees: attendee[] = [];
+let attendees = {"8am": [], "10am": [], "5:15pm": []}
 
 // frontend routes
 app.get("/", (req, res) => {
   res.set('Content-Type', 'text/html');
   let t = new Date();
-  if (t.getDay() == 0 && ((t.getHours() >= 16 && t.getHours() < 18) || (t.getHours() >= 7 && t.getHours() < 9))) {
+  if (t.getDay() == 0 && ((t.getHours() >= 16 && t.getHours() < 18) || (t.getHours() >= 7 && t.getHours() < 9) || (t.getHours() >= 9 && t.getHours() < 11))) {
     res.sendFile(path.join(__dirname, '/../../frontend/index.html'));
   } else {
     res.sendFile(path.join(__dirname, '/../../frontend/unavailable.html'));
@@ -85,39 +85,53 @@ app.post("/admin/validSession", (req, res) => {
 
 app.get("/csv", (req, res) => {
   const sessionId = req.get('sessionId') as string
-  const before = parseInt(req.query.before as string);
-  const after = parseInt(req.query.after as string);
-  res.json(csv(sessionId, before, after, adultAttendees));
+  const service = req.query.service as string;
+  res.json(csv(sessionId, attendees[service], service));
 });
 
 app.delete("/clear", (req, res) => {
   const sessionId = req.get('sessionId') as string
-  res.json(clear(sessionId, adultAttendees));
+  const service = req.query.service as string;
+  res.json(clear(sessionId, attendees[service]));
+});
+
+app.delete("/deleteRegular", (req, res) => {
+  const sessionId = req.get('sessionId') as string
+  const service = req.query.service as string;
+  const id = req.query.id as string;
+  res.json(deleteRegular(id, attendees[service]));
+});
+app.delete("/deleteNew", (req, res) => {
+  const sessionId = req.get('sessionId') as string
+  const firstname = req.query.firstname as string;
+  const lastname = req.query.lastname as string;
+  res.json(deleteNew(firstname, lastname));
 });
 
 app.post("/member/regular", (req, res) => {
-  let { id } = req.body;
+  let { id, service } = req.body;
   console.log(id);
-  res.json(memberRegular(id, printQueue, adultAttendees, people));
+  res.json(memberRegular(id, printQueue, attendees[service], people));
 });
 
 app.post("/member/regulars", (req, res) => {
-  let { id, familyIds } = req.body;
+  let { id, familyIds, service } = req.body;
   console.log(id);
   console.log(familyIds);
   
   let ids: string[] = [...familyIds];
   ids.splice(0,0,id);
-  res.json(memberRegulars(ids, printQueue, adultAttendees, people));
+  res.json(memberRegulars(ids, printQueue, attendees[service], people));
 });
 
 app.get("/member/regular/getAll", (req, res) => {
-  res.json(regularGetAll(adultAttendees));
+  const service = req.query.service as string;
+  res.json(regularGetAll(attendees[service]));
 });
 
 app.post("/member/new", async (req, res) => {
-  let { firstname, lastname, contact } = req.body;
-  memberNew(firstname, lastname, contact, adultAttendees)
+  let { firstname, lastname, contact, service } = req.body;
+  memberNew(firstname, lastname, contact, attendees[service])
     .then((result) => {
       peopleRequest();
       printQueue.push(firstname + ',' + lastname);

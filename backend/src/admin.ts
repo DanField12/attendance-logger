@@ -5,6 +5,9 @@ import { format } from 'date-fns'
 import { doHash } from './attendance';
 import { attendee } from './types';
 
+const gatherings = {'5:15pm': '515pm Gathering', '10am': '10am Gathering', '8am': '8am Gathering'};
+const serviceTimes = {'5:15pm': '05:15 PM', '10am': '10:00 AM', '8am': '08:00 AM'};
+
 function getSessions(): string[] {
   return JSON.parse(fs.readFileSync(path.join(__dirname, './sessions.json')).toString()).sessions;
 }
@@ -13,22 +16,12 @@ function saveSessions(sessions: string[]) {
   fs.writeFileSync(path.join(__dirname, './sessions.json'), JSON.stringify({ sessions: sessions }));
 }
 
-export function csv(sessionId: string, before: number, after: number, adultAttendees: attendee[]) {
+export function csv(sessionId: string, adultAttendees: attendee[], service) {
   let sessions = getSessions();
   if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
 
   return { text: 'First Name,Last Name,Service Date & Time,Location\n' + adultAttendees.reduce(
-    (accumulator, curr) => {
-        
-      let beforeDate = new Date(curr.date);
-      beforeDate.setHours(before, 0);
-      let afterDate = new Date(curr.date);
-      afterDate.setHours(after, 0);
-      if (curr.date.getTime() > beforeDate.getTime() && curr.date.getTime() < afterDate.getTime()) {
-        return `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} 05:15 PM,515pm Gathering\n`
-      }
-      return accumulator;
-    }, ""
+    (accumulator, curr) => `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} ${serviceTimes[service]},${gatherings[service]}\n`, ""
   )};
 }
 
