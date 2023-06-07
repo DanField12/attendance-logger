@@ -20,8 +20,8 @@ export function csv(sessionId: string, adultAttendees: attendee[], service) {
   let sessions = getSessions();
   if (!sessions.includes(sessionId)) throw HTTPError(403, 'invalid session');
 
-  return { text: 'First Name,Last Name,Service Date & Time,Location\n' + adultAttendees.reduce(
-    (accumulator, curr) => `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} ${serviceTimes[service]},${gatherings[service]}\n`, ""
+  return { text: 'First Name,Last Name,Service Date & Time,Location,Check-In Time\n' + adultAttendees.reduce(
+    (accumulator, curr) => `${accumulator}${curr.firstname},${curr.lastname},${format(curr.date, 'd/MM/y')} ${serviceTimes[service]},${gatherings[service]},${format(curr.date, 'H:mm')}\n`, ""
   )};
 }
 
